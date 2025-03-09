@@ -1,117 +1,222 @@
-<style>.about-us-container {
-    background-color: #f3f4f6;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 2rem;
+<style>
+    .about-us-container {
+  background-color: #1F2937;
+  min-height: 100vh;
+  padding: 4rem 2rem;
+  color: #FFFFFF;
+}
+
+.about-us-content {
+  max-width: 1200px;
+  margin: auto;
+}
+
+.title {
+  font-size: 2.5rem;
+  color: #9ca3af;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.description {
+  text-align: center;
+  font-size: 1rem;
+  color: #d1d5db;
+  margin-bottom: 3rem;
+}
+
+.section-title {
+  font-size: 1.75rem;
+  color: #9ca3af;
+  margin-bottom: 1rem;
+}
+
+.section-description {
+  font-size: 1rem;
+  color: #d1d5db;
+  margin-bottom: 2rem;
+}
+
+/* Cards Section */
+.info-cards, .core-values, .team-section {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.card {
+  background-color: #0A0A0A;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+}
+
+.card-title {
+  font-size: 1.25rem;
+  color: #9ca3af;
+  margin-bottom: 0.5rem;
+}
+
+.card-description {
+  font-size: 0.875rem;
+  color: #d1d5db;
+}
+
+/* Impact Section */
+.impact-section {
+  background-color: #0A0A0A;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  margin: 3rem 0;
+  text-align: center;
+}
+
+/* Why Choose Us */
+.why-choose-us {
+  margin-top: 3rem;
+}
+
+.why-choose-us ul {
+  list-style: none;
+  padding: 0;
+}
+
+.why-choose-us ul li {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  color: #d1d5db;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .info-cards, .core-values, .team-section {
+    grid-template-columns: 1fr;
   }
-  
-  .about-us-content {
-    background-color: #ffffff;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    border-radius: 1rem;
-    max-width: 900px;
-    padding: 2rem;
-    text-align: center;
-  }
-  
-  .title {
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: #1f2937;
-    margin-bottom: 1rem;
-  }
-  
-  .description {
-    font-size: 1rem;
-    color: #4b5563;
-    margin-bottom: 2rem;
-  }
-  
-  .info-cards {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-  }
-  
-  .card {
-    background-color: #f9fafb;
-    padding: 1.5rem;
-    border-radius: 0.75rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    transition: transform 0.3s ease;
-  }
-  
-  .card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  }
-  
-  .card-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #374151;
-    margin-bottom: 0.5rem;
-  }
-  
-  .card-description {
-    font-size: 0.875rem;
-    color: #6b7280;
-  }
-  
-  .contact-link {
-    margin-top: 2rem;
-  }
-  
-  .contact-link a {
-    text-decoration: none;
-    color: #2563eb;
-    font-size: 1rem;
-    font-weight: 500;
-    transition: color 0.3s;
-  }
-  
-  .contact-link a:hover {
-    color: #1e40af;
-  }</style>
+}
+</style>
 <div class="about-us-container">
     <div class="about-us-content">
       <h1 class="title">About Us</h1>
       <p class="description">
-        Welcome to our Insurance Broker Portal. We are dedicated to providing the best Business Ownership Policy
-        for small businesses in India. Our mission is to simplify the insurance process and offer tailored
-        solutions to protect your business assets.
+        Welcome to our Business Ownership Policy Portal, a platform dedicated to empowering small business owners
+        by providing seamless, transparent, and affordable insurance solutions. Our mission is to revolutionize the
+        insurance industry by offering tailored policies that meet the unique needs of businesses, ensuring peace of mind
+        and financial security.
       </p>
   
-      <div class="info-cards">
-        <div class="card">
-          <h2 class="card-title">Our Vision</h2>
-          <p class="card-description">
-            To become the most trusted insurance broker for small businesses, offering comprehensive
-            and affordable insurance plans.
-          </p>
-        </div>
+      <!-- Founder Info -->
+      <div class="founder-section">
+        <h2 class="section-title">Founded in 2025</h2>
+        <p class="section-description">
+          Founded in 2025 by <strong>Sarthak Goyal</strong>, our journey began with a clear vision — to simplify the complex insurance
+          process for small businesses and provide them with affordable and comprehensive insurance coverage.
+        </p>
+      </div>
   
+      <!-- Mission, Vision, Business Model -->
+      <div class="info-cards">
         <div class="card">
           <h2 class="card-title">Our Mission</h2>
           <p class="card-description">
-            Simplify the process of obtaining business insurance by providing a seamless online
-            platform with transparent policy comparisons.
+            Our mission is simple — to protect and empower small businesses by offering accessible and affordable Business Ownership Policies (BOPs).
           </p>
         </div>
   
         <div class="card">
-          <h2 class="card-title">Our Values</h2>
+          <h2 class="card-title">Our Vision</h2>
           <p class="card-description">
-            Integrity, transparency, and commitment to protecting the interests of small business
-            owners.
+            Our vision is to become the leading digital insurance platform for small businesses in India by creating a seamless ecosystem for business owners.
+          </p>
+        </div>
+  
+        <div class="card">
+          <h2 class="card-title">Our Business Model</h2>
+          <p class="card-description">
+            We operate on a customer-centric and broker-friendly model ensuring seamless policy management for both parties with quick quote approvals.
           </p>
         </div>
       </div>
   
-      <div class="contact-link">
-        <a href="/contact-us">Contact Us</a>
+      <!-- Impact Section -->
+      <div class="impact-section">
+        <h2 class="section-title">Our Impact</h2>
+        <p class="section-description">
+          We have protected over <strong>500+ small businesses</strong> from financial uncertainties and promoted digital insurance solutions for small businesses.
+        </p>
+      </div>
+  
+      <!-- Core Values -->
+      <div class="core-values">
+        <h2 class="section-title">Our Core Values</h2>
+        <div class="card">
+          <h3 class="card-title">Transparency</h3>
+          <p class="card-description">
+            We ensure 100% transparency in policy coverage, premium calculations, and documentation without hidden charges.
+          </p>
+        </div>
+  
+        <div class="card">
+          <h3 class="card-title">Simplicity</h3>
+          <p class="card-description">
+            Our platform removes unnecessary paperwork and complex jargon, making the process simple and seamless.
+          </p>
+        </div>
+  
+        <div class="card">
+          <h3 class="card-title">Affordability</h3>
+          <p class="card-description">
+            We understand the financial limitations of small businesses and offer competitive premium rates.
+          </p>
+        </div>
+  
+        <div class="card">
+          <h3 class="card-title">Customer Centricity</h3>
+          <p class="card-description">
+            Our focus is to ensure maximum customer satisfaction with fast policy issuance and seamless claim management.
+          </p>
+        </div>
+      </div>
+  
+      <!-- Team Section -->
+      <div class="team-section">
+        <h2 class="section-title">Our Team</h2>
+        <div class="card">
+          <h3 class="card-title">Sarthak Goyal</h3>
+          <p class="card-description">
+            Founder & Product Architect - Leading the product vision and platform architecture with deep knowledge of technology and insurance.
+          </p>
+        </div>
+  
+        <div class="card">
+          <h3 class="card-title">Technology Team</h3>
+          <p class="card-description">
+            Ensuring platform security, speed, and seamless user experience for brokers and customers.
+          </p>
+        </div>
+  
+        <div class="card">
+          <h3 class="card-title">Customer Support</h3>
+          <p class="card-description">
+            Handling every query, policy request, or claim management to ensure maximum satisfaction.
+          </p>
+        </div>
+      </div>
+  
+      <!-- Why Choose Us -->
+      <div class="why-choose-us">
+        <h2 class="section-title">Why Choose Us?</h2>
+        <ul>
+          <li>✅ Hassle-free insurance with minimum paperwork.</li>
+          <li>✅ Tailored Business Ownership Policies (BOP).</li>
+          <li>✅ Competitive premium rates with no hidden charges.</li>
+          <li>✅ Real-time policy management for brokers and business owners.</li>
+        </ul>
       </div>
     </div>
   </div>
