@@ -1,114 +1,159 @@
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BizProtect - Home</title>
-    <link rel="stylesheet" href="style.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #1F2937;
-            color: white;
-        }
-        .hero {
-            background-image: url('C:\Users\Dell\Desktop\Capstone project\home background.webp');
-            background-size: cover;
-            background-position: center;
-            height: 80vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-        .hero-content h1 {
-            font-size: 3rem;
-        }
-        .cta-button {
-            background-color: #0A0A0A;
-            color: white;
-            padding: 15px 30px;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-        .features, .why-choose-us {
-            padding: 60px 20px;
-            text-align: center;
-        }
-        .feature-cards, .reasons {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-        }
-        .card, .reason {
-            background-color: #0A0A0A;
-            padding: 20px;
-            border-radius: 10px;
-            width: 250px;
-        }
-        .footer {
-            background-color: #0A0A0A;
-            text-align: center;
-            padding: 20px 0;
-        }
-    </style>
-</head>
-<body>
+import { Component } from '@angular/core';
 
-<!-- Hero Section -->
-<section class="hero">
-    <div class="hero-content">
-        <h1>Secure Your Business with BizProtect</h1>
-        <p>Your one-stop solution for business insurance management.</p>
-        <a href="/quotes" class="cta-button">Get a Quote</a>
-    </div>
-</section>
+@Component({
+  selector: 'app-dashboard',
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.css']
+})
+export class DashboardComponent {
+  quotes = [
+    { id: 'Q-2025-001', businessName: 'Tech Solutions Inc', premium: '$2,450.00', status: 'Draft', created: 'Jan 15, 2025' },
+    { id: 'Q-2025-002', businessName: 'Coffee Shop LLC', premium: '$1,850.00', status: 'Submitted', created: 'Jan 14, 2025' }
+  ];
+  currentPage = 1;
 
-<!-- Features Section -->
-<section class="features">
-    <h2>Our Key Features</h2>
-    <div class="feature-cards">
-        <div class="card">
-            <h3>Quote Management</h3>
-            <p>Easily generate and manage quotes for your clients.</p>
-        </div>
-        <div class="card">
-            <h3>Policy Details</h3>
-            <p>Access detailed policy information anytime, anywhere.</p>
-        </div>
-        <div class="card">
-            <h3>Client Management</h3>
-            <p>Manage all your clients in one place with ease.</p>
-        </div>
-    </div>
-</section>
+  onEdit(id: string) {
+    console.log('Edit Quote:', id);
+  }
 
-<!-- Why Choose Us Section -->
-<section class="why-choose-us">
-    <h2>Why Choose BizProtect?</h2>
-    <div class="reasons">
-        <div class="reason">
-            <h3>Secure Data</h3>
-            <p>We ensure your business and client data remains secure.</p>
-        </div>
-        <div class="reason">
-            <h3>Fast Processing</h3>
-            <p>Generate quotes and manage policies quickly and efficiently.</p>
-        </div>
-        <div class="reason">
-            <h3>Easy Navigation</h3>
-            <p>Our user-friendly interface makes navigation seamless.</p>
-        </div>
-    </div>
-</section>
+  onDelete(id: string) {
+    console.log('Delete Quote:', id);
+  }
 
-<!-- Footer Section -->
-<footer class="footer">
-    <div class="footer-content">
-        <p>&copy; 2025 BizProtect. All rights reserved.</p>
-    </div>
-</footer>
+  onView(id: string) {
+    console.log('View Quote:', id);
+  }
+}
 
-</body>
-</html>
+
+<!-- dashboard.component.html -->
+<div class="dashboard-container">
+  <h2>Quotes</h2>
+
+  <div class="controls">
+    <input type="text" placeholder="Search quotes..." />
+    <select>
+      <option>All Status</option>
+      <option>Draft</option>
+      <option>Submitted</option>
+    </select>
+    <select>
+      <option>Sort By</option>
+      <option>Date</option>
+      <option>Premium</option>
+    </select>
+    <button>New Quote</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Quote #</th>
+        <th>Business Name</th>
+        <th>Premium</th>
+        <th>Status</th>
+        <th>Created</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let quote of quotes">
+        <td>{{ quote.id }}</td>
+        <td>{{ quote.businessName }}</td>
+        <td>{{ quote.premium }}</td>
+        <td><span class="status {{ quote.status | lowercase }}">{{ quote.status }}</span></td>
+        <td>{{ quote.created }}</td>
+        <td>
+          <i class="fas fa-eye" (click)="onView(quote.id)"></i>
+          <i class="fas fa-edit" (click)="onEdit(quote.id)"></i>
+          <i class="fas fa-trash" (click)="onDelete(quote.id)"></i>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="pagination">
+    <button [disabled]="currentPage === 1">Previous</button>
+    <button class="active">1</button>
+    <button>2</button>
+    <button>3</button>
+    <button>Next</button>
+  </div>
+</div>
+
+
+/* dashboard.component.css */
+.dashboard-container {
+  background-color: #1F2937;
+  color: white;
+  padding: 20px;
+}
+
+h2 {
+  margin-bottom: 20px;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+input, select, button {
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+}
+
+button {
+  background-color: #0A0A0A;
+  color: white;
+}
+
+button:hover {
+  background-color: #333;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table th, table td {
+  padding: 15px;
+  text-align: left;
+}
+
+th {
+  background-color: #0A0A0A;
+}
+
+tr:nth-child(even) {
+  background-color: #121212;
+}
+
+tr:hover {
+  background-color: #222;
+}
+
+.status.draft {
+  background-color: #374151;
+  padding: 5px 10px;
+  border-radius: 15px;
+}
+
+.status.submitted {
+  background-color: #3B82F6;
+  padding: 5px 10px;
+  border-radius: 15px;
+}
+
+.pagination button {
+  margin-right: 5px;
+  padding: 10px 15px;
+}
+
+.pagination .active {
+  background-color: white;
+  color: #0A0A0A;
+}
