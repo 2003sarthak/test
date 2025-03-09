@@ -1,91 +1,118 @@
-import { Component } from '@angular/core';
-
-@Component({
-  selector: 'app-about',
-  template: `
-    <div class="about-container">
-      <div class="about-header">
-        <h1>About BizProtect</h1>
-        <p>Your Reliable Partner in Business Insurance Solutions</p>
-      </div>
-
-      <div class="about-content">
-        <div class="section">
-          <h2>Who We Are</h2>
-          <p>
-            BizProtect is a leading provider of business insurance solutions
-            designed to safeguard small and medium-sized businesses from
-            unexpected risks. Our mission is to make insurance management
-            simple, fast, and accessible for business owners across various
-            industries.
+<style>.about-us-container {
+    background-color: #f3f4f6;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+  }
+  
+  .about-us-content {
+    background-color: #ffffff;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border-radius: 1rem;
+    max-width: 900px;
+    padding: 2rem;
+    text-align: center;
+  }
+  
+  .title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #1f2937;
+    margin-bottom: 1rem;
+  }
+  
+  .description {
+    font-size: 1rem;
+    color: #4b5563;
+    margin-bottom: 2rem;
+  }
+  
+  .info-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+  
+  .card {
+    background-color: #f9fafb;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease;
+  }
+  
+  .card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+  }
+  
+  .card-description {
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+  
+  .contact-link {
+    margin-top: 2rem;
+  }
+  
+  .contact-link a {
+    text-decoration: none;
+    color: #2563eb;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: color 0.3s;
+  }
+  
+  .contact-link a:hover {
+    color: #1e40af;
+  }</style>
+<div class="about-us-container">
+    <div class="about-us-content">
+      <h1 class="title">About Us</h1>
+      <p class="description">
+        Welcome to our Insurance Broker Portal. We are dedicated to providing the best Business Ownership Policy
+        for small businesses in India. Our mission is to simplify the insurance process and offer tailored
+        solutions to protect your business assets.
+      </p>
+  
+      <div class="info-cards">
+        <div class="card">
+          <h2 class="card-title">Our Vision</h2>
+          <p class="card-description">
+            To become the most trusted insurance broker for small businesses, offering comprehensive
+            and affordable insurance plans.
           </p>
         </div>
-
-        <div class="section">
-          <h2>Our Vision</h2>
-          <p>
-            We envision a world where business owners can focus on their
-            growth without worrying about potential risks. By providing
-            comprehensive insurance solutions, we aim to empower businesses to
-            thrive with confidence.
+  
+        <div class="card">
+          <h2 class="card-title">Our Mission</h2>
+          <p class="card-description">
+            Simplify the process of obtaining business insurance by providing a seamless online
+            platform with transparent policy comparisons.
           </p>
         </div>
-
-        <div class="section">
-          <h2>Why Choose Us?</h2>
-          <ul>
-            <li><strong>Expertise:</strong> Our team comprises insurance professionals with years of industry experience.</li>
-            <li><strong>Customizable Plans:</strong> We offer flexible insurance plans tailored to your business needs.</li>
-            <li><strong>Fast and Secure:</strong> Our platform ensures quick processing and secure data management.</li>
-            <li><strong>Dedicated Support:</strong> Our support team is available to assist you at any step.</li>
-          </ul>
+  
+        <div class="card">
+          <h2 class="card-title">Our Values</h2>
+          <p class="card-description">
+            Integrity, transparency, and commitment to protecting the interests of small business
+            owners.
+          </p>
         </div>
       </div>
-
-      <div class="about-footer">
-        <p>&copy; 2025 BizProtect. All rights reserved.</p>
+  
+      <div class="contact-link">
+        <a href="/contact-us">Contact Us</a>
       </div>
     </div>
-  `,
-  styles: [`
-    .about-container {
-      background-color: #1F2937;
-      color: white;
-      padding: 40px;
-    }
-
-    .about-header {
-      text-align: center;
-      margin-bottom: 40px;
-    }
-
-    .about-header h1 {
-      font-size: 3rem;
-    }
-
-    .about-content .section {
-      margin-bottom: 30px;
-    }
-
-    .about-content h2 {
-      color: #fbbf24;
-      margin-bottom: 10px;
-    }
-
-    .about-content p, .about-content ul {
-      line-height: 1.8;
-    }
-
-    .about-content ul li {
-      margin-bottom: 10px;
-    }
-
-    .about-footer {
-      text-align: center;
-      margin-top: 40px;
-      border-top: 1px solid #fbbf24;
-      padding-top: 20px;
-    }
-  `]
-})
-export class AboutComponent {}
+  </div>
+  
