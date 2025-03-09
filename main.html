@@ -1,152 +1,114 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BizProtect Dashboard</title>
+    <title>BizProtect - Home</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1F2937;
+            color: white;
+        }
+        .hero {
+            background-image: url('C:\Users\Dell\Desktop\Capstone project\home background.webp');
+            background-size: cover;
+            background-position: center;
+            height: 80vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .hero-content h1 {
+            font-size: 3rem;
+        }
+        .cta-button {
+            background-color: #0A0A0A;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .features, .why-choose-us {
+            padding: 60px 20px;
+            text-align: center;
+        }
+        .feature-cards, .reasons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .card, .reason {
+            background-color: #0A0A0A;
+            padding: 20px;
+            border-radius: 10px;
+            width: 250px;
+        }
+        .footer {
+            background-color: #0A0A0A;
+            text-align: center;
+            padding: 20px 0;
+        }
+    </style>
 </head>
 <body>
 
-<header class="header">
-    <div class="logo-section">
-        <img src="logo.png" alt="Company Logo" class="company-logo">
-        <h2 class="company-name">BizProtect</h2>
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-content">
+        <h1>Secure Your Business with BizProtect</h1>
+        <p>Your one-stop solution for business insurance management.</p>
+        <a href="/quotes" class="cta-button">Get a Quote</a>
     </div>
-    <div class="header-right">
-        <i class="fas fa-bell notification-icon"></i>
-        <div class="user-info">
-            <img src="user.jpg" alt="User" class="user-img">
-            <span class="user-name">John Broker</span>
+</section>
+
+<!-- Features Section -->
+<section class="features">
+    <h2>Our Key Features</h2>
+    <div class="feature-cards">
+        <div class="card">
+            <h3>Quote Management</h3>
+            <p>Easily generate and manage quotes for your clients.</p>
+        </div>
+        <div class="card">
+            <h3>Policy Details</h3>
+            <p>Access detailed policy information anytime, anywhere.</p>
+        </div>
+        <div class="card">
+            <h3>Client Management</h3>
+            <p>Manage all your clients in one place with ease.</p>
         </div>
     </div>
-</header>
+</section>
 
-<div class="container">
-    <aside class="vertical-navbar">
-        <ul>
-            <li><i class="fas fa-home"></i><span class="nav-text">Home</span></li>
-            <li><i class="fas fa-tachometer-alt"></i><span class="nav-text">Dashboard</span></li>
-            <li><i class="fas fa-file-invoice"></i><span class="nav-text">Quotes</span></li>
-            <li><i class="fas fa-shield-alt"></i><span class="nav-text">Policies</span></li>
-            <li><i class="fas fa-users"></i><span class="nav-text">Clients</span></li>
-        </ul>
-    </aside>
-</div>
+<!-- Why Choose Us Section -->
+<section class="why-choose-us">
+    <h2>Why Choose BizProtect?</h2>
+    <div class="reasons">
+        <div class="reason">
+            <h3>Secure Data</h3>
+            <p>We ensure your business and client data remains secure.</p>
+        </div>
+        <div class="reason">
+            <h3>Fast Processing</h3>
+            <p>Generate quotes and manage policies quickly and efficiently.</p>
+        </div>
+        <div class="reason">
+            <h3>Easy Navigation</h3>
+            <p>Our user-friendly interface makes navigation seamless.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Footer Section -->
+<footer class="footer">
+    <div class="footer-content">
+        <p>&copy; 2025 BizProtect. All rights reserved.</p>
+    </div>
+</footer>
 
 </body>
 </html>
-
-<style>
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-}
-
-.header {
-    background-color: #0A0A0A;
-    color: white;
-    padding: 15px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.company-logo {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    margin-right: 10px;
-}
-
-.logo-section {
-    display: flex;
-    align-items: center;
-}
-
-.company-name {
-    font-size: 20px;
-}
-
-.notification-icon {
-    font-size: 20px;
-    margin-right: 20px;
-    cursor: pointer;
-}
-
-.user-info {
-    display: flex;
-    align-items: center;
-}
-
-.user-img {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    margin-right: 10px;
-}
-
-.user-name {
-    font-size: 16px;
-}
-
-.container {
-    display: flex;
-}
-
-.vertical-navbar {
-    background-color: #1F2937;
-    color: white;
-    width: 60px;
-    height: 100vh;
-    overflow: hidden;
-    transition: width 0.3s;
-    position: fixed;
-    top: 55px;
-    left: 0;
-}
-
-.vertical-navbar:hover {
-    width: 200px;
-}
-
-.vertical-navbar ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-.vertical-navbar li {
-    padding: 15px 20px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-}
-
-.vertical-navbar li i {
-    font-size: 18px;
-    margin-right: 15px;
-}
-
-.nav-text {
-    display: none;
-}
-
-.vertical-navbar:hover .nav-text {
-    display: inline;
-}
-
-.content {
-    margin-left: 60px;
-    padding: 20px;
-    background-color: #1F2937;
-    color: white;
-    min-height: 100vh;
-    transition: margin-left 0.3s;
-}
-
-.vertical-navbar:hover + .content {
-    margin-left: 200px;
-}
-
-</style>
