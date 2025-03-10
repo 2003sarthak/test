@@ -1,0 +1,61 @@
+Here’s a thoughtfully detailed Figma design prompt tailored for your Broker Portal application:
+
+---
+
+**Figma Design Prompt: Broker Portal Web Application**
+
+---
+
+**Project Overview:**
+Design a responsive web application for an insurance company’s Broker Portal that allows brokers to perform various operations such as obtaining insurance quotes, managing insurance policies, and reviewing a rating system for quotes. The application should maintain a user-friendly interface with streamlined workflows for CRUD (Create, Read, Update, Delete) operations and smooth navigation. The target users are insurance brokers in the US, with a focus on P&C (Property and Casualty) insurance for 1–2 states.
+
+---
+
+**Design Requirements:**
+
+1. **Overall Look and Feel:**
+   - Professional, clean, and modern design. Use neutral tones (e.g., white, gray, and light blue) with accents for action buttons (e.g., primary CTA buttons in navy or green).
+   - Typography: Use a clean and accessible font (e.g., Open Sans, Roboto).
+   - Focus on usability and accessibility with WCAG compliance.
+
+2. **Key Pages and Components:**
+
+   **1. Quote Form Page (New Submission):**
+   - A well-structured form to collect data for insurance quotes with sections for common and Line-of-Business (LoB)-specific inputs.
+   - Dynamic premium calculation: Display premium updates in real-time as parameters are changed. Include a highlighted summary of the final quote and rating before submission.
+   - Design clear and distinguishable action buttons: “Submit Quote,” “Reset Fields,” and “Preview Premium.”
+   - Include form validations (e.g., error tooltips and input hints).
+   - Sample inputs for Cyber Insurance (1–2 states).
+
+   **2. Quote List Page:**
+   - Paginated table view of all quotes submitted with sortable columns for Quote ID, Customer Name, Submission Date, Premium, and Status.
+   - Row actions for “View,” “Edit,” “Soft Delete,” and “Submit for Bind” with hover-over effects.
+   - Filters and search bar for quotes based on status, LoB, or time range.
+   - Show visual indicators for action statuses (e.g., colored badges for “In Review,” “Bound,” or “Deleted”).
+
+   **3. Quote Details Page:**
+   - A detailed view of the quote, including all input parameters and the premium breakdown.
+   - Separate sections for rating parameters used during submission.
+   - Include a "readonly" mode if the quote has been submitted for binding or soft-deleted.
+
+   **4. Rating Component:**
+   - A pop-up modal or sidebar integrated into the Quote Form for rating calculations.
+   - Adjustable sliders/dropdowns for rating parameters with visual indicators (e.g., percentage or numeric values).
+   - Provide a preview of the calculated premium dynamically updated based on parameter changes.
+
+   **5. Authentication Screens:**
+   - Design a simple login page with OAuth or DB-based authentication.
+   - Include branding elements such as the company logo.
+
+---
+
+**Other Design Considerations:**
+- Design must be responsive and adapt gracefully to both desktop (Chrome/Edge) and mobile devices.
+- Incorporate loading indicators, error handling UI (e.g., “Something went wrong”), and success notifications.
+- Consistently use tooltips or help icons to explain complex inputs.
+- Ensure the navigation bar clearly highlights the current page (Quote Form, Quote List, etc.).
+- Add footer with legal disclaimers and links (Privacy Policy, Terms of Service).
+
+---
+
+This Figma design prompt covers all critical design aspects for a user-centric Broker Portal application. Let me know if you'd like additional details or further customization!
