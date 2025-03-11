@@ -1,0 +1,190 @@
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+
+interface Quote {
+  brokerName: string;
+  brokerId: string;
+  annualTurnover: number;
+  propertyValue: number;
+  equipmentValue: number;
+  employeeCount: number;
+  businessType: string;
+  locationType: string;
+  securityMeasures: boolean;
+  planType: 'Normal' | 'Gold' | 'Premium';
+  quoteAmount: number;
+}
+
+@Component({
+  selector: 'app-quote-form',
+  templateUrl: './quote-form.component.html',
+  styleUrls: ['./quote-form.component.css']
+})
+export class QuoteFormComponent implements OnInit {
+  step: number = 1;
+  quoteForm: FormGroup;
+  brokerName: string = '';
+  brokerId: string = '';
+
+  constructor(private fb: FormBuilder) {
+    this.quoteForm = this.fb.group({
+      annualTurnover: [null, Validators.required],
+      propertyValue: [null, Validators.required],
+      equipmentValue: [null, Validators.required],
+      employeeCount: [null, Validators.required],
+      businessType: ['', Validators.required],
+      locationType: ['', Validators.required],
+      securityMeasures: [false],
+      planType: ['Normal', Validators.required]
+    });
+  }
+
+  ngOnInit(): void {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    this.brokerName = user.name;
+    this.brokerId = user.id;
+  }
+
+  nextStep() {
+    if (this.step < 4) {
+      this.step++;
+    }
+  }
+
+  prevStep() {
+    if (this.step > 1) {
+      this.step--;
+    }
+  }
+
+  submitQuote() {
+    const formData = this.quoteForm.value;
+    const baseRate = formData.planType === 'Normal' ? 2.5 : formData.planType === 'Gold' ? 5 : 7.5;
+
+    let quoteAmount = (formData.annualTurnover * baseRate) / 100;
+
+    // Adjust premium based on risk factors
+    quoteAmount += (formData.propertyValue * 0.1) / 100;
+    quoteAmount += (formData.equipmentValue * 0.2) / 100;
+    quoteAmount += formData.employeeCount > 20 ? (formData.employeeCount * 1.5) : 0;
+    quoteAmount += formData.businessType === 'High Risk' ? (quoteAmount * 5) / 100 : 0;
+    quoteAmount += formData.locationType === 'Urban' ? (quoteAmount * 2) / 100 : 0;
+    quoteAmount -= formData.securityMeasures ? (quoteAmount * 3) / 100 : 0;
+
+    const newQuote: Quote = {
+      brokerName: this.brokerName,
+      brokerId: this.brokerId,
+      ...formData,
+      quoteAmount
+    };
+
+    const savedQuotes = JSON.parse(localStorage.getItem('quotes') || '[]');
+    savedQuotes.push(newQuote);
+    localStorage.setItem('quotes', JSON.stringify(savedQuotes));
+    alert('Quote submitted successfully!');
+  }
+}
+
+
+<div class="container">
+  <h2>Create a New Quote</h2>
+
+  <form *ngIf="step === 1">
+    <h3>Business Details</h3>
+    <label>Business Name</label>
+    <input type="text" [(ngModel)]="quote.businessName">
+
+    <label>Annual Turnover</label>
+    <input type="number" [(ngModel)]="quote.annualTurnover">
+
+    <label>Business Type</label>
+    <input type="text" [(ngModel)]="quote.businessType">
+
+    <button type="button" (click)="nextStep()">Next</button>
+  </form>
+
+  <form *ngIf="step === 2">
+    <h3>Property Details</h3>
+    <label>Property Type</label>
+    <input type="text" [(ngModel)]="quote.propertyType">
+
+    <label>Property Value</label>
+    <input type="number" [(ngModel)]="quote.propertyValue">
+
+    <label>Ownership Type</label>
+    <input type="text" [(ngModel)]="quote.ownershipType">
+
+    <button type="button" (click)="previousStep()">Back</button>
+    <button type="button" (click)="nextStep()">Next</button>
+  </form>
+
+  <form *ngIf="step === 3">
+    <h3>Security Measures</h3>
+    <label>Security Systems</label>
+    <input type="text" [(ngModel)]="quote.securitySystem">
+
+    <label>Previous Claims</label>
+    <input type="text" [(ngModel)]="quote.previousClaims">
+
+    <label>Preferred Plan</label>
+    <select [(ngModel)]="quote.plan">
+      <option value="Normal">Normal - 2.5%</option>
+      <option value="Gold">Gold - 5%</option>
+      <option value="Premium">Premium - 7.5%</option>
+    </select>
+
+    <button type="button" (click)="previousStep()">Back</button>
+    <button type="button" (click)="submitQuote()">Submit</button>
+  </form>
+</div>
+
+.container {
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+  background-color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+h2 {
+  text-align: center;
+  color: #1F2937;
+}
+
+h3 {
+  margin-bottom: 15px;
+  color: #1F2937;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  color: #6B7280;
+}
+
+input, select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #E5E7EB;
+  border-radius: 5px;
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #1F2937;
+  color: #FFFFFF;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #0A0A0A;
+}
+
+button + button {
+  margin-left: 10px;
+}
