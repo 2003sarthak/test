@@ -1,120 +1,22 @@
-import { Component } from '@angular/core';
-import { UserServiceService } from '../../Services/User.Service/user-service.service';
-import { Router } from '@angular/router';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Quote } from '../../shared/Models/Quote.Model';
-
-@Component({
-  selector: 'app-quote',
-  templateUrl: './quote.component.html',
-  styleUrl: './quote.component.css',
-  standalone: true,
-})
-export class QuoteComponent {
-  step: number = 1;
-  quoteForm: FormGroup;
-  brokerName: string = '';
-  brokerId: string = '';
-  submittedQuote: Quote | null = null;
-  alertMessage: string | null = null;
-  alertType: 'success' | 'error' | null = null;
-
-  constructor(
-    private fb: FormBuilder,
-    private userService: UserServiceService,
-    private router: Router
-  ) {
-    this.quoteForm = this.fb.group({
-      businessName: ['', Validators.required],
-      annualTurnover: [null, Validators.required],
-      propertyValue: [null, Validators.required],
-      equipmentValue: [null, Validators.required],
-      employeeCount: [null, Validators.required],
-      businessType: ['', Validators.required],
-      locationType: ['', Validators.required],
-      securitySystem: ['', Validators.required],
-      previousClaims: ['', Validators.required],
-      securityMeasures: [false],
-      ownershipType: ['', Validators.required],
-      planType: ['Normal', Validators.required],
-    });
-  }
-
-  ngOnInit(): void {
-    if (!this.userService.getLoggedInUser()) {
-      this.router.navigate(['/login']);
-    }
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    this.brokerName = user.name;
-    this.brokerId = user.id;
-  }
-
-  nextStep() {
-    if (this.step < 4) {
-      this.step++;
-    }
-  }
-
-  prevStep() {
-    if (this.step > 1) {
-      this.step--;
-    }
-  }
-
-  submitQuote() {
-    if (this.quoteForm.invalid) {
-      this.alertMessage = 'Please fill in all required fields!';
-      this.alertType = 'error';
-      return;
-    }
-
-    const formData = this.quoteForm.value;
-    const baseRate =
-      formData.planType === 'Normal'
-        ? 2.5
-        : formData.planType === 'Gold'
-        ? 5
-        : 7.5;
-
-    let quoteAmount = (formData.annualTurnover * baseRate) / 100;
-    quoteAmount += (formData.propertyValue * 0.1) / 100;
-    quoteAmount += (formData.equipmentValue * 0.2) / 100;
-    quoteAmount += formData.employeeCount > 20 ? formData.employeeCount * 1.5 : 0;
-    quoteAmount += formData.businessType === 'High Risk' ? (quoteAmount * 5) / 100 : 0;
-    quoteAmount += formData.locationType === 'Urban' ? (quoteAmount * 2) / 100 : 0;
-    quoteAmount -= formData.securityMeasures ? (quoteAmount * 3) / 100 : 0;
-
-    const newQuote: Quote = {
-      brokerName: this.brokerName,
-      brokerId: this.brokerId,
-      ...formData,
-      quoteAmount,
-    };
-
-    const savedQuotes = JSON.parse(localStorage.getItem('quotes') || '[]');
-    savedQuotes.push(newQuote);
-    localStorage.setItem('quotes', JSON.stringify(savedQuotes));
-
-    this.submittedQuote = newQuote;
-    this.alertMessage = 'Quote submitted successfully!';
-    this.alertType = 'success';
-    this.step = 1;
-    this.quoteForm.reset();
-  }
-}
-
 <div class="container">
   <h2>Create a New Quote</h2>
 
   <app-alert *ngIf="alertMessage" [message]="alertMessage" [type]="alertType"></app-alert>
 
-  <form *ngIf="step === 1">
+  <form [formGroup]="quoteForm" *ngIf="step === 1">
     <h3>Business Details</h3>
+    
     <label>Business Name</label>
     <input type="text" formControlName="businessName">
+    <p class="error" *ngIf="quoteForm.controls['businessName'].invalid && quoteForm.controls['businessName'].touched">
+      Business Name is required.
+    </p>
 
     <label>Annual Turnover</label>
     <input type="number" formControlName="annualTurnover">
+    <p class="error" *ngIf="quoteForm.controls['annualTurnover'].invalid && quoteForm.controls['annualTurnover'].touched">
+      Enter a valid turnover amount.
+    </p>
 
     <label>Business Type</label>
     <select formControlName="businessType">
@@ -126,10 +28,14 @@ export class QuoteComponent {
     <button type="button" (click)="nextStep()">Next</button>
   </form>
 
-  <form *ngIf="step === 2">
+  <form [formGroup]="quoteForm" *ngIf="step === 2">
     <h3>Property & Location</h3>
+    
     <label>Property Value</label>
     <input type="number" formControlName="propertyValue">
+    <p class="error" *ngIf="quoteForm.controls['propertyValue'].invalid && quoteForm.controls['propertyValue'].touched">
+      Property Value is required.
+    </p>
 
     <label>Ownership Type</label>
     <select formControlName="ownershipType">
@@ -148,8 +54,9 @@ export class QuoteComponent {
     <button type="button" (click)="nextStep()">Next</button>
   </form>
 
-  <form *ngIf="step === 3">
+  <form [formGroup]="quoteForm" *ngIf="step === 3">
     <h3>Security & Plan Selection</h3>
+    
     <label>Security Systems</label>
     <input type="text" formControlName="securitySystem">
 
@@ -175,58 +82,141 @@ export class QuoteComponent {
   </div>
 </div>
 
+import { Component } from '@angular/core';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
+
+@Component({
+  selector: 'app-quote',
+  templateUrl: './quote.component.html',
+  styleUrls: ['./quote.component.css']
+})
+export class QuoteComponent {
+  step = 1;
+  alertMessage = '';
+  alertType = 'success';
+  submittedQuote: any = null;
+
+  // Define the form group with all controls
+  quoteForm = new FormGroup({
+    businessName: new FormControl('', Validators.required),
+    annualTurnover: new FormControl('', [Validators.required, Validators.min(10000)]),
+    businessType: new FormControl('Retail', Validators.required),
+    
+    propertyValue: new FormControl('', Validators.required),
+    ownershipType: new FormControl('Owned', Validators.required),
+    locationType: new FormControl('Urban', Validators.required),
+    
+    securitySystem: new FormControl(''),
+    previousClaims: new FormControl(''),
+    planType: new FormControl('Normal', Validators.required),
+  });
+
+  // Step Navigation Methods
+  nextStep() {
+    if (this.step === 1 && this.quoteForm.controls['businessName'].valid && this.quoteForm.controls['annualTurnover'].valid) {
+      this.step++;
+    } else if (this.step === 2 && this.quoteForm.controls['propertyValue'].valid) {
+      this.step++;
+    } else {
+      this.alertMessage = 'Please fill in all required fields!';
+      this.alertType = 'error';
+    }
+  }
+
+  prevStep() {
+    this.step--;
+  }
+
+  // Quote Calculation
+  calculateQuote() {
+    let baseRate = 0.025; // 2.5% base rate
+
+    switch (this.quoteForm.value.planType) {
+      case 'Gold':
+        baseRate = 0.05; // 5%
+        break;
+      case 'Premium':
+        baseRate = 0.075; // 7.5%
+        break;
+    }
+
+    return Math.round(this.quoteForm.value.annualTurnover * baseRate);
+  }
+
+  submitQuote() {
+    if (this.quoteForm.valid) {
+      this.submittedQuote = {
+        ...this.quoteForm.value,
+        quoteAmount: this.calculateQuote(),
+      };
+      this.alertMessage = 'Quote submitted successfully!';
+      this.alertType = 'success';
+    } else {
+      this.alertMessage = 'Please complete all required fields!';
+      this.alertType = 'error';
+    }
+  }
+}
+
 .container {
   max-width: 600px;
   margin: auto;
   padding: 20px;
-  background-color: #FFFFFF;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background-color: #f9f9f9;
   border-radius: 8px;
-  margin-top: 85px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 h2 {
   text-align: center;
-  color: #1F2937;
+  color: #333;
 }
 
-h3 {
+.form-group {
   margin-bottom: 15px;
-  color: #1F2937;
 }
 
 label {
   display: block;
+  font-weight: bold;
   margin-bottom: 5px;
-  color: #6B7280;
 }
 
 input, select {
   width: 100%;
-  padding: 10px;
-  margin-bottom: 15px;
-  border: 1px solid #E5E7EB;
-  border-radius: 5px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
 button {
-  padding: 10px 20px;
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
   border: none;
   border-radius: 5px;
-  background-color: #1F2937;
-  color: #FFFFFF;
   cursor: pointer;
-  transition: background-color 0.3s;
 }
 
-button:hover {
-  background-color: #0A0A0A;
+button:disabled {
+  background-color: #ccc;
+}
+
+.error {
+  color: red;
+  font-size: 12px;
+}
+
+.success {
+  color: green;
+  font-weight: bold;
 }
 
 .quote-summary {
   margin-top: 20px;
-  padding: 15px;
-  background-color: #E5E7EB;
+  padding: 10px;
+  border: 2px solid green;
   border-radius: 5px;
+  background-color: #e6ffe6;
 }
-
