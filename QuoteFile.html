@@ -1,154 +1,187 @@
-<div class="container">
-  <h2>Create a New Quote</h2>
-
+### Updated HTML (quote.component.html)
+```html
+<!-- Updated Quote Form HTML with Styling and Error Handling -->
+<div class="quote-form-section">
+  <h1>Create a New Quote</h1>
   <app-alert *ngIf="alertMessage" [message]="alertMessage" [type]="alertType"></app-alert>
 
-  <form [formGroup]="quoteForm" *ngIf="step === 1">
-    <h3>Business Details</h3>
+  <form [formGroup]="quoteForm" *ngIf="step === 1" (ngSubmit)="nextStep()" class="quote-form">
+    <div class="form-group">
+      <label>Business Name</label>
+      <input type="text" formControlName="businessName" />
+      <div class="text-danger" *ngIf="quoteForm.controls['businessName'].touched && quoteForm.controls['businessName'].errors?.['required']">
+        Business Name is required.
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Annual Turnover</label>
+      <input type="number" formControlName="annualTurnover" />
+      <div class="text-danger" *ngIf="quoteForm.controls['annualTurnover'].touched && quoteForm.controls['annualTurnover'].errors?.['required']">
+        Enter a valid turnover amount.
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Business Type</label>
+      <select formControlName="businessType">
+        <option value="Retail">Retail</option>
+        <option value="Manufacturing">Manufacturing</option>
+        <option value="High Risk">High Risk</option>
+      </select>
+    </div>
     
-    <label>Business Name</label>
-    <input type="text" formControlName="businessName">
-    <p class="error" *ngIf="quoteForm.controls['businessName'].invalid && quoteForm.controls['businessName'].touched">
-      Business Name is required.
-    </p>
-
-    <label>Annual Turnover</label>
-    <input type="number" formControlName="annualTurnover">
-    <p class="error" *ngIf="quoteForm.controls['annualTurnover'].invalid && quoteForm.controls['annualTurnover'].touched">
-      Enter a valid turnover amount.
-    </p>
-
-    <label>Business Type</label>
-    <select formControlName="businessType">
-      <option value="Retail">Retail</option>
-      <option value="Manufacturing">Manufacturing</option>
-      <option value="High Risk">High Risk</option>
-    </select>
-
-    <button type="button" (click)="nextStep()">Next</button>
+    <button type="submit" class="submit-button" [disabled]="quoteForm.invalid">Next</button>
   </form>
 
-  <form [formGroup]="quoteForm" *ngIf="step === 2">
-    <h3>Property & Location</h3>
-    
-    <label>Property Value</label>
-    <input type="number" formControlName="propertyValue">
-    <p class="error" *ngIf="quoteForm.controls['propertyValue'].invalid && quoteForm.controls['propertyValue'].touched">
-      Property Value is required.
-    </p>
+  <form [formGroup]="quoteForm" *ngIf="step === 2" (ngSubmit)="nextStep()" class="quote-form">
+    <div class="form-group">
+      <label>Property Value</label>
+      <input type="number" formControlName="propertyValue" />
+      <div class="text-danger" *ngIf="quoteForm.controls['propertyValue'].touched && quoteForm.controls['propertyValue'].errors?.['required']">
+        Property Value is required.
+      </div>
+    </div>
 
-    <label>Ownership Type</label>
-    <select formControlName="ownershipType">
-      <option value="Owned">Owned</option>
-      <option value="Rented">Rented</option>
-    </select>
+    <div class="form-group">
+      <label>Ownership Type</label>
+      <select formControlName="ownershipType">
+        <option value="Owned">Owned</option>
+        <option value="Rented">Rented</option>
+      </select>
+    </div>
 
-    <label>Location Type</label>
-    <select formControlName="locationType">
-      <option value="Urban">Urban</option>
-      <option value="Suburban">Suburban</option>
-      <option value="Rural">Rural</option>
-    </select>
+    <div class="form-group">
+      <label>Location Type</label>
+      <select formControlName="locationType">
+        <option value="Urban">Urban</option>
+        <option value="Suburban">Suburban</option>
+        <option value="Rural">Rural</option>
+      </select>
+    </div>
 
-    <button type="button" (click)="prevStep()">Back</button>
-    <button type="button" (click)="nextStep()">Next</button>
+    <button type="button" class="submit-button" (click)="prevStep()">Back</button>
+    <button type="submit" class="submit-button" [disabled]="quoteForm.invalid">Next</button>
   </form>
 
-  <form [formGroup]="quoteForm" *ngIf="step === 3">
-    <h3>Security & Plan Selection</h3>
-    
-    <label>Security Systems</label>
-    <input type="text" formControlName="securitySystem">
+  <form [formGroup]="quoteForm" *ngIf="step === 3" (ngSubmit)="submitQuote()" class="quote-form">
+    <div class="form-group">
+      <label>Security Systems</label>
+      <input type="text" formControlName="securitySystem" />
+    </div>
 
-    <label>Previous Claims</label>
-    <input type="text" formControlName="previousClaims">
+    <div class="form-group">
+      <label>Previous Claims</label>
+      <input type="text" formControlName="previousClaims" />
+    </div>
 
-    <label>Preferred Plan</label>
-    <select formControlName="planType">
-      <option value="Normal">Normal - 2.5%</option>
-      <option value="Gold">Gold - 5%</option>
-      <option value="Premium">Premium - 7.5%</option>
-    </select>
+    <div class="form-group">
+      <label>Preferred Plan</label>
+      <select formControlName="planType">
+        <option value="Normal">Normal - 2.5%</option>
+        <option value="Gold">Gold - 5%</option>
+        <option value="Premium">Premium - 7.5%</option>
+      </select>
+    </div>
 
-    <button type="button" (click)="prevStep()">Back</button>
-    <button type="button" (click)="submitQuote()">Submit</button>
+    <button type="button" class="submit-button" (click)="prevStep()">Back</button>
+    <button type="submit" class="submit-button" [disabled]="quoteForm.invalid">Submit</button>
   </form>
-
-  <div *ngIf="submittedQuote" class="quote-summary">
-    <h3>Quote Generated Successfully!</h3>
-    <p><strong>Business Name:</strong> {{ submittedQuote.businessName }}</p>
-    <p><strong>Plan:</strong> {{ submittedQuote.planType }}</p>
-    <p><strong>Total Quote Amount:</strong> ₹{{ submittedQuote.quoteAmount }}</p>
-  </div>
 </div>
 
-import { Component } from '@angular/core';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+<!-- Quote Summary -->
+<div *ngIf="submittedQuotes.length" class="quote-summary">
+  <h3>Submitted Quotes</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Business Name</th>
+        <th>Plan</th>
+        <th>Total Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let quote of submittedQuotes">
+        <td>{{ quote.businessName }}</td>
+        <td>{{ quote.planType }}</td>
+        <td>₹{{ quote.quoteAmount }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+```
 
-@Component({
-  selector: 'app-quote',
-  templateUrl: './quote.component.html',
-  styleUrls: ['./quote.component.css']
-})
+### Updated CSS (quote.component.css)
+```css
+.quote-form-section {
+  padding: 50px;
+  text-align: center;
+  color: #ffffff;
+  border-radius: 5px;
+  background-color: #0A0A0A;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 130px auto;
+}
+
+.quote-form {
+  max-width: 500px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group label {
+  margin-bottom: 5px;
+  color: #9ca3af;
+}
+
+.form-group input, .form-group select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #333333;
+  border-radius: 5px;
+  background-color: #1F2937;
+  color: #ffffff;
+}
+
+.submit-button {
+  width: 104%;
+  background-color: #1F2837;
+  color: #ffffff;
+}
+```
+
+### Updated TypeScript (quote.component.ts)
+```typescript
 export class QuoteComponent {
   step = 1;
-  alertMessage = '';
-  alertType = 'success';
-  submittedQuote: any = null;
+  alertMessage: string | null = null;
+  alertType: 'success' | 'error' | null = null;
+  submittedQuotes: any[] = JSON.parse(localStorage.getItem('submittedQuotes') || '[]');
 
-  // Define the form group with all controls
   quoteForm = new FormGroup({
     businessName: new FormControl('', Validators.required),
     annualTurnover: new FormControl('', [Validators.required, Validators.min(10000)]),
     businessType: new FormControl('Retail', Validators.required),
-    
     propertyValue: new FormControl('', Validators.required),
     ownershipType: new FormControl('Owned', Validators.required),
     locationType: new FormControl('Urban', Validators.required),
-    
     securitySystem: new FormControl(''),
     previousClaims: new FormControl(''),
     planType: new FormControl('Normal', Validators.required),
   });
 
-  // Step Navigation Methods
-  nextStep() {
-    if (this.step === 1 && this.quoteForm.controls['businessName'].valid && this.quoteForm.controls['annualTurnover'].valid) {
-      this.step++;
-    } else if (this.step === 2 && this.quoteForm.controls['propertyValue'].valid) {
-      this.step++;
-    } else {
-      this.alertMessage = 'Please fill in all required fields!';
-      this.alertType = 'error';
-    }
-  }
-
-  prevStep() {
-    this.step--;
-  }
-
-  // Quote Calculation
-  calculateQuote() {
-    let baseRate = 0.025; // 2.5% base rate
-
-    switch (this.quoteForm.value.planType) {
-      case 'Gold':
-        baseRate = 0.05; // 5%
-        break;
-      case 'Premium':
-        baseRate = 0.075; // 7.5%
-        break;
-    }
-
-    return Math.round(this.quoteForm.value.annualTurnover * baseRate);
-  }
-
   submitQuote() {
     if (this.quoteForm.valid) {
-      this.submittedQuote = {
+      const newQuote = {
         ...this.quoteForm.value,
         quoteAmount: this.calculateQuote(),
       };
+      this.submittedQuotes.push(newQuote);
+      localStorage.setItem('submittedQuotes', JSON.stringify(this.submittedQuotes));
       this.alertMessage = 'Quote submitted successfully!';
       this.alertType = 'success';
     } else {
@@ -157,66 +190,4 @@ export class QuoteComponent {
     }
   }
 }
-
-.container {
-  max-width: 600px;
-  margin: auto;
-  padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-h2 {
-  text-align: center;
-  color: #333;
-}
-
-.form-group {
-  margin-bottom: 15px;
-}
-
-label {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-input, select {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-button {
-  width: 100%;
-  padding: 10px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-button:disabled {
-  background-color: #ccc;
-}
-
-.error {
-  color: red;
-  font-size: 12px;
-}
-
-.success {
-  color: green;
-  font-weight: bold;
-}
-
-.quote-summary {
-  margin-top: 20px;
-  padding: 10px;
-  border: 2px solid green;
-  border-radius: 5px;
-  background-color: #e6ffe6;
-}
+```
