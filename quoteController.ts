@@ -170,3 +170,46 @@ export class QuoteComponent {
   }
 
 }
+
+
+
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+
+namespace CapstoneBackend.Models
+{
+    public class QuoteModel
+    {
+        [Key,DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int id { get; set; }
+        [Required]
+        public string businessName { get; set; }
+        public string GSTNo { get; set; }
+        [Required]
+        public double annualTurnover { get; set; }
+        [Required]
+        public int propertyValue { get; set; }
+        public string ownershipType { get; set; }
+        [Required]
+        public string businessType { get; set; }
+        [Required]
+        public string locationType { get; set; }
+
+        public string securitySystem { get; set; }
+        public string previousClaims { get; set; }
+
+        public bool securityMeasures { get; set; }
+        [Required]
+        public string planType { get; set; }
+        public double quoteAmount { get; set; }
+        public bool status { get; set; }
+        public DateTime created { get; set; }=DateTime.UtcNow;
+        [Required]
+        public int brokerId { get; set; }
+        [ForeignKey("brokerId")]
+        public UserModel? broker { get; set; }
+        public string brokerName { get; set; }
+
+    }
+}
