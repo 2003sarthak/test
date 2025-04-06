@@ -340,3 +340,100 @@ namespace CapstoneBackend.Controllers
     }
 }
 
+
+using Microsoft.AspNetCore.Mvc;
+using CapstoneBackend.DTOs;
+using Microsoft.AspNetCore.Cors;
+
+namespace CapstoneBackend.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    [EnableCors("allowCors")]
+    public class RatingController : ControllerBase
+    {
+        [HttpPost("calculate")]
+        public IActionResult CalculateQuote([FromBody] QuoteCalculationDto quote)
+        {
+            if (quote == null)
+            {
+                return BadRequest("Invalid quote data.");
+            }
+
+            double baseRate = 0.005;
+            double businessTypeRate = 0;
+            double locationRate = 0;
+            double propertyPer = 0.0005;
+
+            // Plan type adjustment
+            switch (quote.planType)
+            {
+                case "Gold":
+                    baseRate = 0.01;
+                    break;
+                case "Premium":
+                    baseRate = 0.015;
+                    break;
+            }
+
+            // Business type adjustment
+            switch (quote.businessType)
+            {
+                case "Retail":
+                    businessTypeRate = 0.0025;
+                    break;
+                case "Manufacturing":
+                    businessTypeRate = 0.005;
+                    break;
+                case "High Risk":
+                    businessTypeRate = 0.0075;
+                    break;
+            }
+
+            // Property ownership
+            if (quote.ownershipType == "Owned")
+            {
+                propertyPer += 0.00025;
+            }
+            else if (quote.ownershipType == "Rented")
+            {
+                propertyPer -= 0.00025;
+            }
+
+            double propertyRate = quote.propertyValue * propertyPer;
+
+            // Location adjustment
+            switch (quote.locationType)
+            {
+                case "Urban":
+                    locationRate = 0.0025;
+                    break;
+                case "Semiurban":
+                    locationRate = 0.005;
+                    break;
+                case "Rural":
+                    locationRate = 0.0075;
+                    break;
+            }
+
+            double finalRate = baseRate + businessTypeRate + locationRate;
+            double turnoverComponent = quote.annualTurnover * finalRate;
+            double finalQuote = Math.Round(turnoverComponent + propertyRate, 2);
+
+            return Ok(new
+            {
+                quoteAmount = finalQuote,
+                breakdown = new
+                {
+                    baseRate,
+                    businessTypeRate,
+                    locationRate,
+                    propertyRate,
+                    turnoverComponent,
+                    finalRate
+                }
+            });
+        }
+    }
+}
+
