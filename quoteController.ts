@@ -173,267 +173,100 @@ export class QuoteComponent {
 
 
 
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
-
-namespace CapstoneBackend.Models
-{
-    public class QuoteModel
-    {
-        [Key,DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int id { get; set; }
-        [Required]
-        public string businessName { get; set; }
-        public string GSTNo { get; set; }
-        [Required]
-        public double annualTurnover { get; set; }
-        [Required]
-        public int propertyValue { get; set; }
-        public string ownershipType { get; set; }
-        [Required]
-        public string businessType { get; set; }
-        [Required]
-        public string locationType { get; set; }
-
-        public string securitySystem { get; set; }
-        public string previousClaims { get; set; }
-
-        public bool securityMeasures { get; set; }
-        [Required]
-        public string planType { get; set; }
-        public double quoteAmount { get; set; }
-        public bool status { get; set; }
-        public DateTime created { get; set; }=DateTime.UtcNow;
-        [Required]
-        public int brokerId { get; set; }
-        [ForeignKey("brokerId")]
-        public UserModel? broker { get; set; }
-        public string brokerName { get; set; }
-
+export class QuoteCalculationDto {
+    annualTurnover: number;
+    propertyValue: number;
+    ownershipType: string; // Expected values: "Owned" or "Rented"
+    businessType: string;  // Expected values: "Retail", "Manufacturing", "High Risk", etc.
+    locationType: string;  // Expected values: "Urban", "Semiurban", "Rural", etc.
+    planType: string;      // Expected values: "Gold", "Premium", etc.
+  
+    constructor(
+      annualTurnover: number,
+      propertyValue: number,
+      ownershipType: string,
+      businessType: string,
+      locationType: string,
+      planType: string
+    ) {
+      this.annualTurnover = annualTurnover;
+      this.propertyValue = propertyValue;
+      this.ownershipType = ownershipType;
+      this.businessType = businessType;
+      this.locationType = locationType;
+      this.planType = planType;
     }
+  }
+
+export interface Quote {
+  id: string;
+  brokerName: string;
+  brokerId: string;
+  businessName: string;
+  GSTNo:string;
+  annualTurnover: number;
+  propertyType: string;
+  propertyValue: number;
+  ownershipType: string;
+  businessType: string;
+  locationType: string;
+  securitySystem: string;
+  previousClaims: string;
+  securityMeasures: boolean;
+  planType: 'Normal' | 'Gold' | 'Premium';
+  quoteAmount: number;
+  status: boolean;
+  created: Date;
 }
 
+export class RatingService {
+  private apiBaseUrl = 'http://localhost:5111/api/Rating'; 
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using CapstoneBackend.Models;
-using Microsoft.AspNetCore.Cors;
+  constructor(private http: HttpClient) {}
 
-namespace CapstoneBackend.Controllers
-{
-    [Route("api/[controller]")]
-    [ApiController]
-    [EnableCors("allowCors")]
-    public class QuoteModelsController : ControllerBase
-    {
-        private readonly AppDbContext _context;
+  calculateQuote(quote: QuoteCalculationDto): Observable<any> {
+    return this.http.post<any>(`${this.apiBaseUrl}/calculate`, quote);
+  }
 
-        public QuoteModelsController(AppDbContext context)
-        {
-            _context = context;
-        }
-
-        // GET: api/QuoteModels
-        [HttpGet("list")]
-        public async Task<ActionResult<IEnumerable<QuoteModel>>> GetQuotes()
-        {
-            return await _context.Quotes.Include(q=>q.broker).ToListAsync();
-        }
-
-        // GET: api/QuoteModels/5
-        [HttpGet("get/{id}")]
-        public async Task<ActionResult<QuoteModel>> GetQuoteModel(int id)
-        {
-            var quoteModel = await _context.Quotes.FindAsync(id);
-
-            if (quoteModel == null)
-            {
-                return NotFound("Quote Not Found");
-            }
-
-            return quoteModel;
-        }
-
-
-        // PUT: api/QuoteModels/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("edit/{id}")]
-        public async Task<IActionResult> PutQuoteModel(int id, QuoteModel quoteModel)
-        {
-            if (id != quoteModel.id)
-            {
-                return BadRequest("Quote ID Missmatch");
-            }
-
-            _context.Entry(quoteModel).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!QuoteModelExists(id))
-                {
-                    return NotFound("Quote Not Found");
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return Ok(new { message = "Quote Edited successfully " });
-        }
-
-        // POST: api/QuoteModels
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost("create")]
-        public async Task<ActionResult<QuoteModel>> PostQuoteModel([FromBody] QuoteModel quoteModel, [FromHeader] string userEmail)
-        {
-            if(quoteModel == null)
-            {
-                return BadRequest("Invalid data");
-            }
-            var broker =await _context.Users.Include(u=>u.quotes).FirstOrDefaultAsync(u => u.email == userEmail);
-            if (broker == null)
-            {
-                return Unauthorized("Invalid user");
-            }
-            quoteModel.broker = null;
-            quoteModel.brokerId = broker.BrokerId;
-            quoteModel.brokerName = broker.fullName;
-            broker.quotes.Add(quoteModel);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetQuoteModel", new { id = quoteModel.id }, quoteModel);
-        }
-
-        // DELETE: api/QuoteModels/5
-        [HttpDelete("delete/{id}")]
-        public async Task<IActionResult> DeleteQuoteModel(int id)
-        {
-            var quoteModel = await _context.Quotes.FindAsync(id);
-            if (quoteModel == null)
-            {
-                return NotFound("Quote Not Found");
-            }
-
-            _context.Quotes.Remove(quoteModel);
-            await _context.SaveChangesAsync();
-
-            return Ok(new {message="Quote Deleted successfully "});
-        }
-
-
-
-        private bool QuoteModelExists(int id)
-        {
-            return _context.Quotes.Any(e => e.id == id);
-        }
-    }
 }
 
+export class QuoteService {
+  private apiBaseUrl = 'http://localhost:5111/api/Quotes'; // Replace with your backend API's URL
 
-using Microsoft.AspNetCore.Mvc;
-using CapstoneBackend.DTOs;
-using Microsoft.AspNetCore.Cors;
+  constructor(private http: HttpClient) {}
 
-namespace CapstoneBackend.Controllers
-{
-    [Route("api/[controller]")]
-    [ApiController]
-    [EnableCors("allowCors")]
-    public class RatingController : ControllerBase
-    {
-        [HttpPost("calculate")]
-        public IActionResult CalculateQuote([FromBody] QuoteCalculationDto quote)
-        {
-            if (quote == null)
-            {
-                return BadRequest("Invalid quote data.");
-            }
+  private getHeaders(): HttpHeaders {
+    const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser') || '{}');
+    const email = loggedInUser.email || '';
+    const brokerId = loggedInUser.brokerId || '';
+    const brokerName = loggedInUser.brokerName || '';
 
-            double baseRate = 0.005;
-            double businessTypeRate = 0;
-            double locationRate = 0;
-            double propertyPer = 0.0005;
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      'userEmail': email,
+      'brokerId': brokerId,
+      'brokerName': brokerName
+    });
+  }
 
-            // Plan type adjustment
-            switch (quote.planType)
-            {
-                case "Gold":
-                    baseRate = 0.01;
-                    break;
-                case "Premium":
-                    baseRate = 0.015;
-                    break;
-            }
+  getQuotes(): Observable<Quote[]> {
+    return this.http.get<Quote[]>(`${this.apiBaseUrl}/list`, { headers: this.getHeaders() });
+  }
 
-            // Business type adjustment
-            switch (quote.businessType)
-            {
-                case "Retail":
-                    businessTypeRate = 0.0025;
-                    break;
-                case "Manufacturing":
-                    businessTypeRate = 0.005;
-                    break;
-                case "High Risk":
-                    businessTypeRate = 0.0075;
-                    break;
-            }
+  getQuoteById(id: number): Observable<Quote> {
+    return this.http.get<Quote>(`${this.apiBaseUrl}/get/${id}`, { headers: this.getHeaders() });
+  }
 
-            // Property ownership
-            if (quote.ownershipType == "Owned")
-            {
-                propertyPer += 0.00025;
-            }
-            else if (quote.ownershipType == "Rented")
-            {
-                propertyPer -= 0.00025;
-            }
+  createQuote(quote: Quote): Observable<Quote> {
+    return this.http.post<Quote>(`${this.apiBaseUrl}/create`, quote, { headers: this.getHeaders() });
+  }
 
-            double propertyRate = quote.propertyValue * propertyPer;
+  editQuote(id: number, quote: Quote): Observable<any> {
+    return this.http.put(`${this.apiBaseUrl}/edit/${id}`, quote, { headers: this.getHeaders() });
+  }
 
-            // Location adjustment
-            switch (quote.locationType)
-            {
-                case "Urban":
-                    locationRate = 0.0025;
-                    break;
-                case "Semiurban":
-                    locationRate = 0.005;
-                    break;
-                case "Rural":
-                    locationRate = 0.0075;
-                    break;
-            }
+  deleteQuote(id: number): Observable<any> {
+    return this.http.delete(`${this.apiBaseUrl}/delete/${id}`, { headers: this.getHeaders() });
+  }
 
-            double finalRate = baseRate + businessTypeRate + locationRate;
-            double turnoverComponent = quote.annualTurnover * finalRate;
-            double finalQuote = Math.Round(turnoverComponent + propertyRate, 2);
-
-            return Ok(new
-            {
-                quoteAmount = finalQuote,
-                breakdown = new
-                {
-                    baseRate,
-                    businessTypeRate,
-                    locationRate,
-                    propertyRate,
-                    turnoverComponent,
-                    finalRate
-                }
-            });
-        }
-    }
 }
-
