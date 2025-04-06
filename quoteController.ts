@@ -270,3 +270,143 @@ export class QuoteService {
   }
 
 }
+
+
+
+import { Component } from '@angular/core';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { CommonModule, NgIf } from '@angular/common';
+import { AlertComponent } from '../../shared/Components/alert/alert.component';
+import { UserServiceService } from '../../Services/User.Service/user-service.service';
+import { Router } from '@angular/router';
+import { QuoteService } from '../../Services/Quote.Service/quote.service';
+import { RatingService } from '../../Services/Rating.Service/rating.service';
+import { HttpClientModule } from '@angular/common/http';
+import { QuoteCalculationDto } from '../../Models/quote-calculation.dto';
+import { Quote } from '../../Models/quote.model';
+
+@Component({
+  selector: 'app-quote',
+  imports: [NgIf, AlertComponent, FormsModule, ReactiveFormsModule, CommonModule, HttpClientModule],
+  templateUrl: './quote.component.html',
+  styleUrl: './quote.component.css',
+  standalone: true,
+})
+export class QuoteComponent {
+  constructor(
+    private userService: UserServiceService,
+    private router: Router,
+    private quoteService: QuoteService,
+    private ratingService: RatingService
+  ) {}
+
+  step = 1;
+  alertMessage: string | null = null;
+  alertType: 'success' | 'error' | null = null;
+  submittedQuote: Quote | null = null;
+  loggedInUser: any = null;
+
+  ngOnInit(): void {
+    const user = this.userService.getLoggedInUser();
+    if (!user) {
+      this.router.navigate(['/login']);
+    } else {
+      this.loggedInUser = user;
+    }
+  }
+
+  quoteForm = new FormGroup({
+    businessName: new FormControl('', Validators.required),
+    GSTNo: new FormControl('', [Validators.minLength(15), Validators.maxLength(15)]),
+    annualTurnover: new FormControl('', [Validators.required, Validators.min(10000)]),
+    businessType: new FormControl('Retail', Validators.required),
+    propertyValue: new FormControl('', Validators.required),
+    ownershipType: new FormControl('Owned', Validators.required),
+    locationType: new FormControl('Urban', Validators.required),
+    securitySystem: new FormControl(''),
+    previousClaims: new FormControl(''),
+    planType: new FormControl('Normal', Validators.required),
+  });
+
+  // Step navigation
+  nextStep() {
+    if (this.step === 1 && this.quoteForm.controls['businessName'].valid && this.quoteForm.controls['annualTurnover'].valid) {
+      this.step++;
+    } else if (this.step === 2 && this.quoteForm.controls['propertyValue'].valid) {
+      this.step++;
+    } else {
+      this.alertMessage = 'Please fill in all required fields!';
+      this.alertType = 'error';
+    }
+  }
+
+  prevStep() {
+    this.step--;
+  }
+
+  // Submit quote using backend calculation and quote services
+  submitQuote() {
+    if (!this.quoteForm.valid || !this.loggedInUser) {
+      this.alertMessage = 'Please complete all required fields!';
+      this.alertType = 'error';
+      return;
+    }
+
+    const formValue = this.quoteForm.value;
+
+    const quoteDto = new QuoteCalculationDto(
+      Number(formValue.annualTurnover),
+      Number(formValue.propertyValue),
+      formValue.ownershipType!,
+      formValue.businessType!,
+      formValue.locationType!,
+      formValue.planType!
+    );
+
+    this.ratingService.calculateQuote(quoteDto).subscribe({
+      next: (calculated) => {
+        const newQuote: Quote = {
+          id: '', // Will be set by backend
+          brokerName: this.loggedInUser.fullName,
+          brokerId: this.loggedInUser.brokerId || `Bro00${this.loggedInUser.index || 1}`,
+          businessName: formValue.businessName!,
+          GSTNo: formValue.GSTNo!,
+          annualTurnover: Number(formValue.annualTurnover),
+          propertyType: '', // Not in form, keep empty or update accordingly
+          propertyValue: Number(formValue.propertyValue),
+          ownershipType: formValue.ownershipType!,
+          businessType: formValue.businessType!,
+          locationType: formValue.locationType!,
+          securitySystem: formValue.securitySystem!,
+          previousClaims: formValue.previousClaims!,
+          securityMeasures: false, // Add actual logic if needed
+          planType: formValue.planType as 'Normal' | 'Gold' | 'Premium',
+          quoteAmount: calculated.quoteAmount,
+          status: false,
+          created: new Date(),
+        };
+
+        this.quoteService.createQuote(newQuote).subscribe({
+          next: (response) => {
+            this.submittedQuote = response;
+            this.alertMessage = 'Quote submitted successfully!';
+            this.alertType = 'success';
+            this.quoteForm.reset();
+            this.step = 1;
+          },
+          error: (err) => {
+            this.alertMessage = 'Error submitting quote to server.';
+            this.alertType = 'error';
+            console.error(err);
+          }
+        });
+      },
+      error: (err) => {
+        this.alertMessage = 'Error calculating quote from server.';
+        this.alertType = 'error';
+        console.error(err);
+      }
+    });
+  }
+}
+
