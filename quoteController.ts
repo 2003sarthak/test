@@ -1,338 +1,172 @@
-using CapstoneBackend.Models;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+import { Component } from '@angular/core';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { CommonModule, NgIf } from '@angular/common';
+import { AlertComponent } from '../../shared/Components/alert/alert.component';
+import { UserServiceService } from '../../Services/User.Service/user-service.service';
+import { Router } from '@angular/router';
 
-namespace CapstoneBackend.Helpers
-{
-    public class JwtHelper
-    {
-        public static string GenerateToken(UserModel user, IConfiguration configuration)
-        {
-            var claims = new[]
-            {
-            new Claim(JwtRegisteredClaimNames.Sub, user.email),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim("UserId", user.BrokerId.ToString()),
-            new Claim("FullName", user.fullName)
-        };
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(
-                issuer: configuration["Jwt:Issuer"],
-                audience: configuration["Jwt:Audience"],
-                claims: claims,
-                expires: DateTime.Now.AddMinutes(60),
-                signingCredentials: creds
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-    }
-}
-
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace CapstoneBackend.Models
-{
-    public class UserModel
-    {
-        [Key,DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int BrokerId { get; set; }
-        [Required]
-        public string fullName { get; set; }
-        [Required,EmailAddress]
-        public string email { get; set; }
-        [Required]
-        public string password { get; set; }
-
-        public ICollection<QuoteModel> quotes { get; set; }=new List<QuoteModel>();
-
-    }
-}
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using CapstoneBackend.Models;
-using Microsoft.AspNetCore.Cors;
-using CapstoneBackend.Helpers;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.AspNetCore.Authorization;
-
-namespace CapstoneBackend.Controllers
-{
-    [Authorize]
-    [Route("api/[controller]")]
-    [ApiController]
-    [EnableCors("allowCors")]
-    public class UserModelsController : ControllerBase
-    {
-        private readonly AppDbContext _context;
-
-        public UserModelsController(AppDbContext context)
-        {
-            _context = context;
-        }
-
-        // GET: api/UserModels
-        [HttpGet("list")]
-        public async Task<ActionResult<IEnumerable<UserModel>>> GetUsers()
-        {
-            return await _context.Users.ToListAsync();
-        }
-        [AllowAnonymous]
-        // GET: api/UserModels/5
-        [HttpPost("login")]
-        public async Task<ActionResult<UserModel>> GetUserModel([FromBody] LoginRequest request)
-        {
-            if (string.IsNullOrEmpty(request.email) || string.IsNullOrEmpty(request.password))
-            {
-                return BadRequest("Email and password are required");
-            }
-
-            var userModel = await _context.Users.FirstOrDefaultAsync(u => u.email == request.email && u.password == request.password);
-
-            if (userModel == null)
-            {
-                return Unauthorized("Invalid EmailId or password");
-            }
-
-            var token = JwtHelper.GenerateToken(userModel, _context.GetService<IConfiguration>());
-
-            return Ok(new { token });
-
-        }
-
-        // GET: api/UserModels/quotes/5
-        [HttpGet("quotes/{id}")]
-        public async Task<ActionResult<UserModel>> GetQuotesByUser(int id)
-        {
-            var userModel = await _context.Users.Include(u => u.quotes).FirstOrDefaultAsync(u => u.BrokerId == id);
-
-            if (userModel == null)
-            {
-                return NotFound("User Not Found ");
-            }
-
-            return Ok(userModel.quotes.ToList());
-        }
-
-        // PUT: api/UserModels/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("edit/{id}")]
-        public async Task<IActionResult> PutUserModel(int id, UserModel userModel)
-        {
-            if (id != userModel.BrokerId)
-            {
-                return BadRequest("User ID missmatch ");
-            }
-
-            _context.Entry(userModel).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserModelExists(id))
-                {
-                    return NotFound("User Not Found");
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return Ok(new { message = "Quote Edited successfully " });
-        }
-
-        // POST: api/UserModels
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [AllowAnonymous]
-        [HttpPost("register")]
-        public async Task<ActionResult<UserModel>> PostUserModel(UserModel userModel)
-        {
-            if (userModel == null)
-            {
-                return BadRequest("Invalid user Data");
-            }
-
-            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.email == userModel.email);
-            if (existingUser != null)
-            {
-                return Conflict("A user with this email already exists. ");
-            }
-            _context.Users.Add(userModel);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetUserModel", new { id = userModel.BrokerId }, userModel);
-        }
-
-        // DELETE: api/UserModels/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUserModel(int id)
-        {
-            var userModel = await _context.Users.FindAsync(id);
-            if (userModel == null)
-            {
-                return NotFound("User Id Not Found ");
-            }
-
-            _context.Users.Remove(userModel);
-            await _context.SaveChangesAsync();
-
-            return Ok(new { message = "User deleted successfully " });
-        }
-
-        private bool UserModelExists(int id)
-        {
-            return _context.Users.Any(e => e.BrokerId == id);
-        }
-    }
-}
-
-
-// import { Injectable } from '@angular/core';
-// import { User } from '../../shared/Models/User.Model';
-// import { BehaviorSubject } from 'rxjs';
-// import * as bcrypt from 'bcryptjs';
-
-// @Injectable({
-//   providedIn: 'root'
-// })
-// export class UserServiceService {
-
-//   private users: User[] = [];
-//   private loggedInUser: User | null = null;
-//   private userLoggedInSubject = new BehaviorSubject<User | null>(null);
-//   userLoggedIn$ = this.userLoggedInSubject.asObservable();
-
-//   constructor() {
-//     const storedUsers = localStorage.getItem('users');
-//     if (storedUsers) {
-//       this.users = JSON.parse(storedUsers);
-//     }
-//     const storedLoggedInUser = localStorage.getItem('loggedInUser');
-//     if (storedLoggedInUser) {
-//       this.loggedInUser = JSON.parse(storedLoggedInUser);
-//       this.userLoggedInSubject.next(this.loggedInUser);
-//     }
-//   }
-
-//   addUser(user: User): void {
-//     const salt = bcrypt.genSaltSync(10);
-//     user.password = bcrypt.hashSync(user.password, salt);
-//     this.users.push(user);
-//     localStorage.setItem('users', JSON.stringify(this.users));
-//     this.setLoggedInUser(user);
-//   }
-
-//   getUser(email: string, password: string): User | undefined {
-//     const user = this.users.find(user => user.email === email);
-//     if (user && bcrypt.compareSync(password, user.password)) {
-//       return user;
-//     }
-//     return undefined;
-//   }
-
-//   setLoggedInUser(user: User): void {
-//     this.loggedInUser = user;
-//     localStorage.setItem('loggedInUser', JSON.stringify(user));
-//     this.userLoggedInSubject.next(user);
-//   }
-
-//   getLoggedInUser(): User | null {
-//     return this.loggedInUser;
-//   }
-
-//   logout(): void {
-//     this.loggedInUser = null;
-//     localStorage.removeItem('loggedInUser');
-//     this.userLoggedInSubject.next(null);
-//   }
-
-// }
-
-
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import { User } from '../../shared/Models/User.Model';
-import * as bcrypt from 'bcryptjs';
-import { HttpClient } from '@angular/common/http';
-
-@Injectable({
-  providedIn: 'root'
+@Component({
+  selector: 'app-quote',
+  imports: [NgIf,AlertComponent,FormsModule,ReactiveFormsModule,CommonModule],
+  templateUrl: './quote.component.html',
+  styleUrl: './quote.component.css',
+  standalone:true,
 })
-export class UserServiceService {
+export class QuoteComponent {
+  constructor(private userService: UserServiceService, private router: Router) { }
+  step = 1;
+  alertMessage: string | null = null;
+  alertType: 'success' | 'error' | null = null;
+  submittedQuote: any = null;
+  submittedQuotes: any[] = JSON.parse(localStorage.getItem('submittedQuotes') || '[]');
+  loggedInUser: any = null;
 
-  private loggedInUser: User | null = null;
-  private userLoggedInSubject = new BehaviorSubject<User | null>(null);
-  userLoggedIn$ = this.userLoggedInSubject.asObservable();
+  ngOnInit(): void {
+    const user = this.userService.getLoggedInUser();
+    if (!this.userService.getLoggedInUser()) {
+      this.router.navigate(['/login']);
+    }else {
+      this.loggedInUser = user; 
+    }
 
-  private apiBaseUrl = 'http://localhost:5111/api/UserModels'; 
+  }
 
-  constructor(private http: HttpClient) {
-    const storedLoggedInUser = localStorage.getItem('loggedInUser');
-    if (storedLoggedInUser) {
-      this.loggedInUser = JSON.parse(storedLoggedInUser);
-      this.userLoggedInSubject.next(this.loggedInUser);
+  // Define the form group with all controls
+  quoteForm = new FormGroup({
+    businessName: new FormControl('', Validators.required),
+    GSTNo:new FormControl('',[Validators.minLength(15),Validators.maxLength(15)]),
+    annualTurnover: new FormControl('', [Validators.required, Validators.min(10000)]),
+    businessType: new FormControl('Retail', Validators.required),
+    propertyValue: new FormControl('', Validators.required),
+    ownershipType: new FormControl('Owned', Validators.required),
+    locationType: new FormControl('Urban', Validators.required),
+    securitySystem: new FormControl(''),
+    previousClaims: new FormControl(''),
+    planType: new FormControl('Normal', Validators.required),
+  });
+
+  // Variables for displaying breakdown in the summary
+  baseRate = 0.005;
+  businessTypeRate = 0;
+  propertyRate = 0;
+  propertyPer = 0;
+  locationRate = 0;
+  finalRate = 0;
+  finalValue = 0;
+
+  // Step Navigation Methods
+  nextStep() {
+    if (this.step === 1 && this.quoteForm.controls['businessName'].valid && this.quoteForm.controls['annualTurnover'].valid) {
+      this.step++;
+    } else if (this.step === 2 && this.quoteForm.controls['propertyValue'].valid) {
+      this.step++;
+    } else {
+      this.alertMessage = 'Please fill in all required fields!';
+      this.alertType = 'error';
     }
   }
 
-  addUser(user: User): Promise<User> {
-    return this.http.post<User>(`${this.apiBaseUrl}/register`, user).toPromise()
-      .then((newUser) => {
-        if (!newUser) {
-          throw new Error('User registration failed or returned invalid data.');
-        }
-        const salt = bcrypt.genSaltSync(10);
-        newUser.password = bcrypt.hashSync(newUser.password || '', salt);
-        this.setLoggedInUser(newUser);
-        return newUser;
-      }).catch((error) => {
-        console.error('Registration error:', error);
-        throw error;
-      });
-  }
-  
-
-  getUser(email: string, password: string): Promise<User | null> {
-    return this.http.post<User>(`${this.apiBaseUrl}/login`, { email, password }).toPromise()
-      .then((user) => {
-        if (user) {
-          this.setLoggedInUser(user);
-          return user;
-        }
-        return null;
-      }).catch(() => {
-        return null;
-      });
+  prevStep() {
+    this.step--;
   }
 
-  setLoggedInUser(user: User): void {
-    localStorage.setItem('loggedInUser', JSON.stringify(user));
-    this.loggedInUser = user;
-    this.userLoggedInSubject.next(user);
+  // Quote Calculation
+  calculateQuote() {
+    this.baseRate = 0.005; // 0.1%
+
+    // Plan type adjustment
+    switch (this.quoteForm.value.planType) {
+      case 'Gold':
+        this.baseRate = 0.01;
+        break;
+      case 'Premium':
+        this.baseRate = 0.015;
+        break;
+    }
+
+    // Business type adjustment
+    switch (this.quoteForm.value.businessType) {
+      case 'Retail':
+        this.businessTypeRate = 0.0025;
+        break;
+      case 'Manufacturing':
+        this.businessTypeRate = 0.005;
+        break;
+      case 'High Risk':
+        this.businessTypeRate = 0.0075;
+        break;
+    }
+
+    // Property value adjustment
+    this.propertyPer= 0.0005; 
+    if (this.quoteForm.value.ownershipType === 'Owned') {
+      this.propertyPer += 0.00025; 
+    } else if (this.quoteForm.value.ownershipType === 'Rented') {
+      this.propertyPer -= 0.00025;
+    }
+    this.propertyRate = Number(this.quoteForm.value.propertyValue)*this.propertyPer ;
+
+    // Location type adjustment
+    switch (this.quoteForm.value.locationType) {
+      case 'Urban':
+        this.locationRate = 0.0025;
+        break;
+      case 'Semiurban':
+        this.locationRate = 0.005;
+        break;
+      case 'Rural':
+        this.locationRate = 0.0075;
+        break;
+    }
+
+    // Calculate final rate
+    this.finalRate =
+      this.baseRate + this.businessTypeRate + this.locationRate;
+    
+    this.finalValue=Math.round(Number(this.quoteForm.value.annualTurnover) * this.finalRate);
+
+    // Calculate the quote
+    return this.finalValue + this.propertyRate;
   }
 
-  getLoggedInUser(): User | null {
-    return this.loggedInUser;
+  submitQuote() {
+    if (this.quoteForm.valid) {
+      const currentDate = new Date(); 
+      const id = `Q-2025-${this.submittedQuotes.length + 1}`;
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const brokerIndex = users.findIndex((user: any) => user.fullName === this.loggedInUser.fullName);
+      const brokerId = `Bro00${brokerIndex}`;
+      const brokerName = this.loggedInUser.fullName;
+      
+      this.submittedQuote = {
+        ...this.quoteForm.value,
+        quoteAmount: this.calculateQuote(),
+        status: false, 
+        createdAt: currentDate.toISOString(), 
+        id: id,
+        brokerName: brokerName,
+        brokerId: brokerId,
+      };
+      const newQuote = {
+        ...this.quoteForm.value,
+        quoteAmount: this.calculateQuote(),
+        status: false, 
+        createdAt: currentDate.toISOString(),
+        id: id,
+        brokerName: brokerName,
+        brokerId: brokerId,
+      };
+      this.submittedQuotes.push(newQuote);
+      localStorage.setItem('submittedQuotes', JSON.stringify(this.submittedQuotes));
+      this.alertMessage = 'Quote submitted successfully!';
+      this.alertType = 'success';
+      //reset the form 
+      this.quoteForm.reset();
+      this.step = 1; 
+    } else {
+      this.alertMessage = 'Please complete all required fields!';
+      this.alertType = 'error';
+    }
   }
 
-  logout(): void {
-    this.loggedInUser = null;
-    localStorage.removeItem('loggedInUser');
-    this.userLoggedInSubject.next(null);
-  }
 }
