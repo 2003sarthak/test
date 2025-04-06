@@ -1,44 +1,38 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
+using CapstoneBackend.Models;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
-namespace CapstoneBackend.Models
+namespace CapstoneBackend.Helpers
 {
-    public class QuoteModel
+    public class JwtHelper
     {
-        [Key,DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int id { get; set; }
-        [Required]
-        public string businessName { get; set; }
-        public string GSTNo { get; set; }
-        [Required]
-        public double annualTurnover { get; set; }
-        [Required]
-        public int propertyValue { get; set; }
-        public string ownershipType { get; set; }
-        [Required]
-        public string businessType { get; set; }
-        [Required]
-        public string locationType { get; set; }
+        public static string GenerateToken(UserModel user, IConfiguration configuration)
+        {
+            var claims = new[]
+            {
+            new Claim(JwtRegisteredClaimNames.Sub, user.email),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim("UserId", user.BrokerId.ToString()),
+            new Claim("FullName", user.fullName)
+        };
 
-        public string securitySystem { get; set; }
-        public string previousClaims { get; set; }
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        public bool securityMeasures { get; set; }
-        [Required]
-        public string planType { get; set; }
-        public double quoteAmount { get; set; }
-        public bool status { get; set; }
-        public DateTime created { get; set; }=DateTime.UtcNow;
-        [Required]
-        public int brokerId { get; set; }
-        [ForeignKey("brokerId")]
-        public UserModel borker { get; set; }
-        public string brokerName { get; set; }
+            var token = new JwtSecurityToken(
+                issuer: configuration["Jwt:Issuer"],
+                audience: configuration["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddMinutes(60),
+                signingCredentials: creds
+            );
 
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
     }
 }
-
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -61,7 +55,6 @@ namespace CapstoneBackend.Models
     }
 }
 
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -70,53 +63,80 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CapstoneBackend.Models;
+using Microsoft.AspNetCore.Cors;
+using CapstoneBackend.Helpers;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CapstoneBackend.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class QuoteModelsController : ControllerBase
+    [EnableCors("allowCors")]
+    public class UserModelsController : ControllerBase
     {
         private readonly AppDbContext _context;
 
-        public QuoteModelsController(AppDbContext context)
+        public UserModelsController(AppDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/QuoteModels
+        // GET: api/UserModels
         [HttpGet("list")]
-        public async Task<ActionResult<IEnumerable<QuoteModel>>> GetQuotes()
+        public async Task<ActionResult<IEnumerable<UserModel>>> GetUsers()
         {
-            return await _context.Quotes.Include(q=>q.borker).ToListAsync();
+            return await _context.Users.ToListAsync();
         }
-
-        // GET: api/QuoteModels/5
-        [HttpGet("get/{id}")]
-        public async Task<ActionResult<QuoteModel>> GetQuoteModel(int id)
+        [AllowAnonymous]
+        // GET: api/UserModels/5
+        [HttpPost("login")]
+        public async Task<ActionResult<UserModel>> GetUserModel([FromBody] LoginRequest request)
         {
-            var quoteModel = await _context.Quotes.FindAsync(id);
-
-            if (quoteModel == null)
+            if (string.IsNullOrEmpty(request.email) || string.IsNullOrEmpty(request.password))
             {
-                return NotFound("Quote Not Found");
+                return BadRequest("Email and password are required");
             }
 
-            return quoteModel;
+            var userModel = await _context.Users.FirstOrDefaultAsync(u => u.email == request.email && u.password == request.password);
+
+            if (userModel == null)
+            {
+                return Unauthorized("Invalid EmailId or password");
+            }
+
+            var token = JwtHelper.GenerateToken(userModel, _context.GetService<IConfiguration>());
+
+            return Ok(new { token });
+
         }
 
+        // GET: api/UserModels/quotes/5
+        [HttpGet("quotes/{id}")]
+        public async Task<ActionResult<UserModel>> GetQuotesByUser(int id)
+        {
+            var userModel = await _context.Users.Include(u => u.quotes).FirstOrDefaultAsync(u => u.BrokerId == id);
 
-        // PUT: api/QuoteModels/5
+            if (userModel == null)
+            {
+                return NotFound("User Not Found ");
+            }
+
+            return Ok(userModel.quotes.ToList());
+        }
+
+        // PUT: api/UserModels/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("edit/{id}")]
-        public async Task<IActionResult> PutQuoteModel(int id, QuoteModel quoteModel)
+        public async Task<IActionResult> PutUserModel(int id, UserModel userModel)
         {
-            if (id != quoteModel.id)
+            if (id != userModel.BrokerId)
             {
-                return BadRequest("Quote ID Missmatch");
+                return BadRequest("User ID missmatch ");
             }
 
-            _context.Entry(quoteModel).State = EntityState.Modified;
+            _context.Entry(userModel).State = EntityState.Modified;
 
             try
             {
@@ -124,9 +144,9 @@ namespace CapstoneBackend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!QuoteModelExists(id))
+                if (!UserModelExists(id))
                 {
-                    return NotFound("Quote Not Found");
+                    return NotFound("User Not Found");
                 }
                 else
                 {
@@ -137,61 +157,182 @@ namespace CapstoneBackend.Controllers
             return Ok(new { message = "Quote Edited successfully " });
         }
 
-        // POST: api/QuoteModels
+        // POST: api/UserModels
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost("create")]
-        public async Task<ActionResult<QuoteModel>> PostQuoteModel([FromBody] QuoteModel quoteModel, [FromHeader] string userEmail)
+        [AllowAnonymous]
+        [HttpPost("register")]
+        public async Task<ActionResult<UserModel>> PostUserModel(UserModel userModel)
         {
-            if(quoteModel == null)
+            if (userModel == null)
             {
-                return BadRequest("Invalid data");
+                return BadRequest("Invalid user Data");
             }
-            var borker =await _context.Users.FirstOrDefaultAsync(u=>u.email == userEmail);
-            if(borker == null)
+
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.email == userModel.email);
+            if (existingUser != null)
             {
-                return Unauthorized("Invalid user");
+                return Conflict("A user with this email already exists. ");
             }
-            quoteModel.brokerId = borker.BrokerId;
-            quoteModel.brokerName = borker.fullName;
-            _context.Quotes.Add(quoteModel);
+            _context.Users.Add(userModel);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetQuoteModel", new { id = quoteModel.id }, quoteModel);
+            return CreatedAtAction("GetUserModel", new { id = userModel.BrokerId }, userModel);
         }
 
-        // DELETE: api/QuoteModels/5
-        [HttpDelete("delete/{id}")]
-        public async Task<IActionResult> DeleteQuoteModel(int id)
+        // DELETE: api/UserModels/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUserModel(int id)
         {
-            var quoteModel = await _context.Quotes.FindAsync(id);
-            if (quoteModel == null)
+            var userModel = await _context.Users.FindAsync(id);
+            if (userModel == null)
             {
-                return NotFound("Quote Not Found");
+                return NotFound("User Id Not Found ");
             }
 
-            _context.Quotes.Remove(quoteModel);
+            _context.Users.Remove(userModel);
             await _context.SaveChangesAsync();
 
-            return Ok(new {message="Quote Deleted successfully "});
+            return Ok(new { message = "User deleted successfully " });
         }
 
-
-
-        private bool QuoteModelExists(int id)
+        private bool UserModelExists(int id)
         {
-            return _context.Quotes.Any(e => e.id == id);
+            return _context.Users.Any(e => e.BrokerId == id);
         }
     }
 }
 
 
-      VALUES (@p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10, @p11, @p12, @p13, @p14, @p15, @p16, @p17, @p18, @p19);
-fail: Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddleware[1]
-      An unhandled exception has occurred while executing the request.
-      System.Text.Json.JsonException: A possible object cycle was detected. This can either be due to a cycle or if the object depth is larger than the maximum allowed depth of 32. Consider using ReferenceHandler.Preserve on JsonSerializerOptions to support cycles. Path: $.borker.quotes.borker.quotes.borker.quotes.borker.quotes.borker.quotes.borker.quotes.borker.quotes.borker.quotes.borker.quotes.borker.quotes.borker.BrokerId.
-         at System.Text.Json.ThrowHelper.ThrowJsonException_SerializerCycleDetected(Int32 maxDepth)
-         at System.Text.Json.Serialization.JsonConverter`1.TryWrite(Utf8JsonWriter writer, T& value, JsonSerializerOptions options, WriteStack& state)
-         at System.Text.Json.Serialization.Metadata.JsonPropertyInfo`1.GetMemberAndWriteJson(Object obj, WriteStack& state, Utf8JsonWriter writer)
-         at System.Text.Json.Serialization.Converters.ObjectDefaultConverter`1.OnTryWrite(Utf8JsonWriter writer, T value, JsonSerializerOptions options, WriteStack& state)
-         at System.Text.Json.Serialization.JsonConverter`1.TryWrite(Utf8JsonWriter writer, T& value, JsonSerializerOptions options, WriteStack& state)
-         at System.Text.Json.Serialization.Metadata.JsonPropertyInfo`1.GetMemberAndWriteJson(Object obj, WriteStack& state, Utf8JsonWriter writer)
+// import { Injectable } from '@angular/core';
+// import { User } from '../../shared/Models/User.Model';
+// import { BehaviorSubject } from 'rxjs';
+// import * as bcrypt from 'bcryptjs';
+
+// @Injectable({
+//   providedIn: 'root'
+// })
+// export class UserServiceService {
+
+//   private users: User[] = [];
+//   private loggedInUser: User | null = null;
+//   private userLoggedInSubject = new BehaviorSubject<User | null>(null);
+//   userLoggedIn$ = this.userLoggedInSubject.asObservable();
+
+//   constructor() {
+//     const storedUsers = localStorage.getItem('users');
+//     if (storedUsers) {
+//       this.users = JSON.parse(storedUsers);
+//     }
+//     const storedLoggedInUser = localStorage.getItem('loggedInUser');
+//     if (storedLoggedInUser) {
+//       this.loggedInUser = JSON.parse(storedLoggedInUser);
+//       this.userLoggedInSubject.next(this.loggedInUser);
+//     }
+//   }
+
+//   addUser(user: User): void {
+//     const salt = bcrypt.genSaltSync(10);
+//     user.password = bcrypt.hashSync(user.password, salt);
+//     this.users.push(user);
+//     localStorage.setItem('users', JSON.stringify(this.users));
+//     this.setLoggedInUser(user);
+//   }
+
+//   getUser(email: string, password: string): User | undefined {
+//     const user = this.users.find(user => user.email === email);
+//     if (user && bcrypt.compareSync(password, user.password)) {
+//       return user;
+//     }
+//     return undefined;
+//   }
+
+//   setLoggedInUser(user: User): void {
+//     this.loggedInUser = user;
+//     localStorage.setItem('loggedInUser', JSON.stringify(user));
+//     this.userLoggedInSubject.next(user);
+//   }
+
+//   getLoggedInUser(): User | null {
+//     return this.loggedInUser;
+//   }
+
+//   logout(): void {
+//     this.loggedInUser = null;
+//     localStorage.removeItem('loggedInUser');
+//     this.userLoggedInSubject.next(null);
+//   }
+
+// }
+
+
+import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
+import { User } from '../../shared/Models/User.Model';
+import * as bcrypt from 'bcryptjs';
+import { HttpClient } from '@angular/common/http';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class UserServiceService {
+
+  private loggedInUser: User | null = null;
+  private userLoggedInSubject = new BehaviorSubject<User | null>(null);
+  userLoggedIn$ = this.userLoggedInSubject.asObservable();
+
+  private apiBaseUrl = 'http://localhost:5111/api/UserModels'; 
+
+  constructor(private http: HttpClient) {
+    const storedLoggedInUser = localStorage.getItem('loggedInUser');
+    if (storedLoggedInUser) {
+      this.loggedInUser = JSON.parse(storedLoggedInUser);
+      this.userLoggedInSubject.next(this.loggedInUser);
+    }
+  }
+
+  addUser(user: User): Promise<User> {
+    return this.http.post<User>(`${this.apiBaseUrl}/register`, user).toPromise()
+      .then((newUser) => {
+        if (!newUser) {
+          throw new Error('User registration failed or returned invalid data.');
+        }
+        const salt = bcrypt.genSaltSync(10);
+        newUser.password = bcrypt.hashSync(newUser.password || '', salt);
+        this.setLoggedInUser(newUser);
+        return newUser;
+      }).catch((error) => {
+        console.error('Registration error:', error);
+        throw error;
+      });
+  }
+  
+
+  getUser(email: string, password: string): Promise<User | null> {
+    return this.http.post<User>(`${this.apiBaseUrl}/login`, { email, password }).toPromise()
+      .then((user) => {
+        if (user) {
+          this.setLoggedInUser(user);
+          return user;
+        }
+        return null;
+      }).catch(() => {
+        return null;
+      });
+  }
+
+  setLoggedInUser(user: User): void {
+    localStorage.setItem('loggedInUser', JSON.stringify(user));
+    this.loggedInUser = user;
+    this.userLoggedInSubject.next(user);
+  }
+
+  getLoggedInUser(): User | null {
+    return this.loggedInUser;
+  }
+
+  logout(): void {
+    this.loggedInUser = null;
+    localStorage.removeItem('loggedInUser');
+    this.userLoggedInSubject.next(null);
+  }
+}
