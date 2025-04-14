@@ -1,0 +1,171 @@
+<div class="terms-container">
+
+  <div class="card" *ngFor="let policy of policies">
+    <h2>Terms and Conditions</h2>
+    <h3>Policy Type: <span class="highlight">{{ policy.type }}</span></h3>
+
+    <div class="card-section">
+      <h4>Coverage Details:</h4>
+      <p>{{ policy.description }}</p>
+    </div>
+
+    <div class="card-section">
+      <h4>Claim Reimbursement:</h4>
+      <p>You are entitled to <strong>{{ policy.claimPercentage }}%</strong> of the assessed claim amount.</p>
+    </div>
+
+    <div class="card-section">
+      <h4>Included Coverages:</h4>
+      <div class="coverage-card" *ngFor="let coverage of commonCoverages">
+        {{ coverage }}
+      </div>
+    </div>
+
+    <div class="card-section" *ngIf="policy.extraCoverages">
+      <h4>Additional Benefits for {{ policy.type }} Plan:</h4>
+      <div class="coverage-card premium" *ngFor="let extra of policy.extraCoverages">
+        {{ extra }}
+      </div>
+    </div>
+
+    <div class="card-section">
+      <h4>General Terms:</h4>
+      <ul>
+        <li>Claims to be submitted within 15 days.</li>
+        <li>Document proofs required for claims.</li>
+        <li>Inspection and verification applicable.</li>
+        <li>Policy exclusions apply as per document.</li>
+      </ul>
+    </div>
+
+    <div class="card-section">
+      <h4>Exclusions:</h4>
+      <ul>
+        <li>Intentional damages or fraud claims.</li>
+        <li>Illegal activities or negligence.</li>
+        <li>Pre-existing damages or liabilities.</li>
+      </ul>
+    </div>
+
+    <div class="footer-note">
+      <p>By submitting your quote, you agree to these Terms and Conditions for the {{ policy.type }} plan.</p>
+    </div>
+  </div>
+
+</div>
+
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+
+interface PolicyTerms {
+  type: string;
+  claimPercentage: number;
+  description: string;
+  extraCoverages?: string[];
+}
+
+@Component({
+  selector: 'app-terms-and-conditions',
+  templateUrl: './terms-and-conditions.component.html',
+  styleUrls: ['./terms-and-conditions.component.css']
+})
+export class TermsAndConditionsComponent implements OnInit {
+
+  selectedPolicyType: string | null = null;
+  policies: PolicyTerms[] = [];
+  commonCoverages: string[] = [];
+
+  constructor(private route: ActivatedRoute) {}
+
+  ngOnInit(): void {
+    this.route.queryParamMap.subscribe(params => {
+      this.selectedPolicyType = params.get('policyType');
+      this.loadPolicies();
+      this.loadCommonCoverages();
+    });
+  }
+
+  loadPolicies() {
+    const allPolicies: PolicyTerms[] = [
+      {
+        type: 'Normal',
+        claimPercentage: 60,
+        description: 'Provides coverage up to 60% of losses incurred due to insured risks such as theft, fire, or natural disasters.'
+      },
+      {
+        type: 'Gold',
+        claimPercentage: 80,
+        description: 'Offers up to 80% reimbursement on claims for a broader range of damages.',
+        extraCoverages: ['Accidental Losses', 'Minor Damage Coverage']
+      },
+      {
+        type: 'Platinum',
+        claimPercentage: 100,
+        description: 'Covers 100% of eligible losses including business interruption and accidental losses.',
+        extraCoverages: ['Accidental Losses', 'Minor Damage Coverage', 'Business Interruption']
+      }
+    ];
+
+    if (this.selectedPolicyType) {
+      this.policies = allPolicies.filter(p => p.type === this.selectedPolicyType);
+    } else {
+      this.policies = allPolicies;
+    }
+  }
+
+  loadCommonCoverages() {
+    this.commonCoverages = [
+      'Property Damage',
+      'Third-Party Liability',
+      'Theft and Burglary',
+      'Fire and Natural Disasters',
+      'Equipment Breakdown',
+      'Public Liability',
+      'Employee Compensation'
+    ];
+  }
+
+}
+
+.terms-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding: 30px;
+}
+
+.card {
+  background-color: #ffffff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+
+h2, h3 {
+  margin-top: 0;
+}
+
+.card-section {
+  margin-top: 20px;
+}
+
+.coverage-card {
+  background-color: #f5f5f5;
+  padding: 12px;
+  border-radius: 8px;
+  margin: 8px 0;
+}
+
+.coverage-card.premium {
+  background-color: #ffe9b3;
+}
+
+.footer-note {
+  margin-top: 25px;
+  font-style: italic;
+}
+
+.highlight {
+  color: #2b6cb0;
+  font-weight: 600;
+}
