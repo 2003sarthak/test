@@ -2,12 +2,12 @@
   <h1>Create a New Quote</h1>
   <app-alert *ngIf="alertMessage" [message]="alertMessage" [type]="alertType"></app-alert>
 
-  <form [formGroup]="quoteForm" *ngIf="step === 1" (ngSubmit)="nextStep()" class="quote-form">
+  <!-- Step 1 Form -->
+  <form [formGroup]="quoteForm" *ngIf="step === 1" class="quote-form">
     <div class="form-group">
       <label>Business Name</label>
       <input type="text" formControlName="businessName" />
-      <div class="text-danger"
-        *ngIf="quoteForm.controls['businessName'].touched && quoteForm.controls['businessName'].errors?.['required']">
+      <div class="text-danger" *ngIf="quoteForm.controls['businessName'].touched && quoteForm.controls['businessName'].errors?.['required']">
         Business Name is required.
       </div>
     </div>
@@ -15,8 +15,8 @@
     <div class="form-group">
       <label>GST Number</label>
       <input type="text" formControlName="gstNo" />
-      <div class="text-danger"
-        *ngIf="quoteForm.controls['gstNo'].touched && (quoteForm.controls['gstNo'].errors?.['minlength'] || quoteForm.controls['gstNo'].errors?.['maxlength'])">
+      <div class="text-danger" *ngIf="quoteForm.controls['gstNo'].touched && 
+        (quoteForm.controls['gstNo'].errors?.['minlength'] || quoteForm.controls['gstNo'].errors?.['maxlength'])">
         The length must be exactly 15 characters.
       </div>
     </div>
@@ -24,12 +24,10 @@
     <div class="form-group">
       <label>Annual Turnover</label>
       <input type="number" formControlName="annualTurnover" />
-      <div class="text-danger"
-        *ngIf="quoteForm.controls['annualTurnover'].touched && quoteForm.controls['annualTurnover'].errors?.['min']">
+      <div class="text-danger" *ngIf="quoteForm.controls['annualTurnover'].touched && quoteForm.controls['annualTurnover'].errors?.['min']">
         The turnover must be at least ₹10,000.
       </div>
-      <div class="text-danger"
-        *ngIf="quoteForm.controls['annualTurnover'].touched && quoteForm.controls['annualTurnover'].errors?.['required']">
+      <div class="text-danger" *ngIf="quoteForm.controls['annualTurnover'].touched && quoteForm.controls['annualTurnover'].errors?.['required']">
         Please enter a turnover amount.
       </div>
     </div>
@@ -43,16 +41,15 @@
       </select>
     </div>
 
-    <!-- <button type="submit" class="submit-button" [disabled]="quoteForm.invalid">Next</button> -->
     <button type="button" class="submit-button" (click)="nextStep()">Next</button>
   </form>
 
-  <form [formGroup]="quoteForm" *ngIf="step === 2" (ngSubmit)="nextStep()" class="quote-form">
+  <!-- Step 2 Form -->
+  <form [formGroup]="quoteForm" *ngIf="step === 2" class="quote-form">
     <div class="form-group">
       <label>Property Value</label>
       <input type="number" formControlName="propertyValue" />
-      <div class="text-danger"
-        *ngIf="quoteForm.controls['propertyValue'].touched && quoteForm.controls['propertyValue'].errors?.['required']">
+      <div class="text-danger" *ngIf="quoteForm.controls['propertyValue'].touched && quoteForm.controls['propertyValue'].errors?.['required']">
         Property Value is required.
       </div>
     </div>
@@ -75,16 +72,15 @@
     </div>
 
     <button type="button" class="submit-button" (click)="prevStep()">Back</button>
-    <!-- <button type="submit" class="submit-button" [disabled]="quoteForm.invalid">Next</button> -->
     <button type="button" class="submit-button" (click)="nextStep()">Next</button>
   </form>
 
-  <form [formGroup]="quoteForm" *ngIf="step === 3" (ngSubmit)="submitQuote()" class="quote-form">
+  <!-- Step 3 Form -->
+  <form [formGroup]="quoteForm" *ngIf="step === 3" class="quote-form">
     <div class="form-group">
       <label>Security Systems</label>
       <input type="text" formControlName="securitySystem" />
-      <div class="text-danger"
-        *ngIf="quoteForm.controls['securitySystem'].touched && quoteForm.controls['securitySystem'].errors?.['required']">
+      <div class="text-danger" *ngIf="quoteForm.controls['securitySystem'].touched && quoteForm.controls['securitySystem'].errors?.['required']">
         Security Systems is required. If unsure, simply enter 'Decent' as the default value.
       </div>
     </div>
@@ -92,8 +88,7 @@
     <div class="form-group">
       <label>Previous Claims</label>
       <input type="text" formControlName="previousClaims" />
-      <div class="text-danger"
-        *ngIf="quoteForm.controls['previousClaims'].touched && quoteForm.controls['previousClaims'].errors?.['required']">
+      <div class="text-danger" *ngIf="quoteForm.controls['previousClaims'].touched && quoteForm.controls['previousClaims'].errors?.['required']">
         Previous Claims is required. If unsure, simply enter 'None' as the default value.
       </div>
     </div>
@@ -108,49 +103,76 @@
     </div>
 
     <button type="button" class="submit-button" (click)="prevStep()">Back</button>
-    <button type="submit" class="submit-button" [disabled]="quoteForm.invalid">Submit</button>
+    <button type="button" class="submit-button" (click)="calculateQuote()">Calculate Quote</button>
   </form>
-  <div *ngIf="submittedQuote" class="quote-summary">
-    <h3>Quote Generated Successfully!</h3>
-    <p><strong>Business Name:</strong> {{ submittedQuote.businessName }}</p>
-    <p><strong>Plan:</strong> {{ submittedQuote.planType }}</p>
 
-    <!-- Quote Breakdown Table -->
+  <!-- Quote Summary in Table Format -->
+  <div *ngIf="quoteAmount !== null" class="quote-summary">
+    <h2>Quote Summary</h2>
     <table class="quote-table">
       <thead>
         <tr>
           <th>Factor</th>
-          <th>Percentage/Adjustment</th>
+          <th>Value</th>
         </tr>
       </thead>
       <tbody>
         <tr>
+          <td><strong>Quote Amount</strong></td>
+          <td>₹{{ quoteAmount | number:'1.3-3' }}</td>
+        </tr>
+        <tr>
           <td>Base Rate</td>
-          <td>{{  baseRate ? baseRate * 100 : 0 }}%</td>
+          <td>{{ baseRate }}%</td>
         </tr>
         <tr>
-          <td>Business Type Adjustment</td>
-          <td>{{ businessTypeRate ? businessTypeRate * 100 : 0 }}%</td>
+          <td>Business Type Rate</td>
+          <td>{{ businessTypeRate }}%</td>
         </tr>
         <tr>
-          <td>Location Adjustment</td>
-          <td>{{ locationRate ? locationRate * 100 : 0}}%</td>
+          <td>Location Rate</td>
+          <td>{{ locationRate }}%</td>
         </tr>
         <tr>
-          <td><strong>Total Adjustment</strong></td>
-          <td><strong>{{ finalRate ? finalRate * 100 : 0  }}%</strong></td>
+          <td>Property Rate</td>
+          <td>₹{{ propertyRate | number:'1.3-3' }}</td>
         </tr>
         <tr>
-          <td>Property Value</td>
-          <td>Rs {{ propertyRate | number:'1.3-3'}}</td>
+          <td>Total Adjustment</td>
+          <td>{{ finalRate | number:'1.3-3'  }}%</td>
         </tr>
       </tbody>
     </table>
+    <button type="button" class="finalsubmit-button" (click)="submitQuote()">Submit Quote</button>
+  </div>
 
-    <p><strong>Total Quote Amount:</strong> ₹{{ submittedQuote.quoteAmount }}</p>
+  <!-- Submitted Quote -->
+  <div *ngIf="submittedQuote" class="quote-summary">
+    <h3>Quote Submitted Successfully!</h3>
+    <table class="quote-table">
+      <thead>
+        <tr>
+          <th>Detail</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Business Name</strong></td>
+          <td>{{ submittedQuote.businessName }}</td>
+        </tr>
+        <tr>
+          <td><strong>Preferred Plan</strong></td>
+          <td>{{ submittedQuote.planType }}</td>
+        </tr>
+        <tr>
+          <td><strong>Total Quote Amount</strong></td>
+          <td>₹{{ submittedQuote.quoteAmount | number:'1.3-3' }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>
-
 
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -182,6 +204,7 @@ export class QuoteComponent {
   alertMessage: string | null = null;
   alertType: 'success' | 'error' | null = null;
   submittedQuote: Quote | null = null;
+  quoteDetails: Quote | null = null;
   loggedInUser: any = null;
 
   quoteAmount: number | null = null;
@@ -230,16 +253,15 @@ export class QuoteComponent {
     this.step--;
   }
 
-  // Submit quote using backend calculation and quote services
-  submitQuote() {
-    if (!this.quoteForm.valid || !this.loggedInUser) {
+  calculateQuote() {
+    if (!this.quoteForm.valid) {
       this.alertMessage = 'Please complete all required fields!';
       this.alertType = 'error';
       return;
     }
-    console.log(this.loggedInUser);
+  
     const formValue = this.quoteForm.value;
-
+  
     const quoteDto = new QuoteCalculationDto(
       Number(formValue.annualTurnover),
       Number(formValue.propertyValue),
@@ -248,8 +270,7 @@ export class QuoteComponent {
       formValue.locationType!,
       formValue.planType!
     );
-    console.log(quoteDto);
-
+  
     this.ratingService.calculateQuote(quoteDto).subscribe({
       next: (calculated) => {
         this.quoteAmount = calculated.quoteAmount;
@@ -259,53 +280,62 @@ export class QuoteComponent {
         this.propertyRate = calculated.breakdown.propertyRate;
         this.turnoverComponent = calculated.breakdown.turnoverComponent;
         this.finalRate = calculated.breakdown.finalRate;
-        const newQuote: Quote = {
-          // id: '', // Will be set by backend
-          brokerName: this.loggedInUser.fullName,
-          brokerId: this.loggedInUser.brokerId,
-          businessName: formValue.businessName!,
-          gstNo: formValue.gstNo!,
-          annualTurnover: Number(formValue.annualTurnover),
-          propertyValue: Number(formValue.propertyValue),
-          ownershipType: formValue.ownershipType!,
-          businessType: formValue.businessType!,
-          locationType: formValue.locationType!,
-          securitySystem: formValue.securitySystem!,
-          previousClaims: formValue.previousClaims!,
-          securityMeasures: true, // Add actual logic if needed
-          planType: formValue.planType as 'Normal' | 'Gold' | 'Premium',
-          quoteAmount: calculated.quoteAmount,
-          status: false,
-          created: new Date(),
-        };
-        console.log(newQuote);
-        this.quoteService.createQuote(newQuote).subscribe({
-          next: (response) => {
-            console.log(this.quoteForm);
-            this.submittedQuote = response;
-            this.alertMessage = 'Quote submitted successfully!';
-            this.alertType = 'success';
-            this.quoteForm.reset();
-            this.step = 1;
-          },
-          error: (err) => {
-            console.log(this.quoteForm);
-            this.alertMessage = 'Error submitting quote to server.';
-            this.alertType = 'error';
-            console.error(err);
-          }
-        });
+  
+        this.alertMessage = 'Quote calculated successfully!';
+        this.alertType = 'success';
       },
       error: (err) => {
-        console.log(this.quoteForm);
         this.alertMessage = 'Error calculating quote from server.';
         this.alertType = 'error';
         console.error(err);
-      }
+      },
     });
   }
-}
 
-
-
-now I want to update a functionlaity of quote submission form page like i want that on single submit the broker will get the quote summery first then it can review and edit the form first and can re udate the form and re review it and a seprate submit buttom should be there to submit the form to the backend  this is to let user review and then submit the form ye I got and idea for this like I have 3 forms connected to each other the third form has submit button add a forth page where all submitted details will be there and the broker can review the datails and the generated code also be there only but the details are not submitted to the backend now a submit button is there where the user can submit the quote to backend or can go back and uodate the changes the third page button should be review where quote calculation comes but not submitting the quote to backend
+  submitQuote() {
+    if (!this.quoteForm.valid || this.quoteAmount === null) {
+      this.alertMessage = 'Please calculate the quote before submitting!';
+      this.alertType = 'error';
+      return;
+    }
+  
+    const formValue = this.quoteForm.value;
+  
+    const newQuote: Quote = {
+      brokerName: this.loggedInUser.fullName,
+      brokerId: this.loggedInUser.brokerId,
+      businessName: formValue.businessName!,
+      gstNo: formValue.gstNo!,
+      annualTurnover: Number(formValue.annualTurnover),
+      propertyValue: Number(formValue.propertyValue),
+      ownershipType: formValue.ownershipType!,
+      businessType: formValue.businessType!,
+      locationType: formValue.locationType!,
+      securitySystem: formValue.securitySystem!,
+      previousClaims: formValue.previousClaims!,
+      securityMeasures: true, // Add actual logic if needed
+      planType: formValue.planType as 'Normal' | 'Gold' | 'Premium',
+      quoteAmount: this.quoteAmount, // Use calculated quote amount
+      status: false,
+      created: new Date(),
+    };
+  
+    this.quoteService.createQuote(newQuote).subscribe({
+      next: (response) => {
+        this.submittedQuote = response;
+        this.alertMessage = 'Quote submitted successfully!';
+        this.alertType = 'success';
+        this.quoteForm.reset();
+        this.step = 1;
+        this.quoteAmount = null; // Reset calculated quote
+        setTimeout(() => {
+          this.router.navigate(['/dashboard']); 
+        }, 3000);
+      },
+      error: (err) => {
+        this.alertMessage = 'Error submitting quote to server.';
+        this.alertType = 'error';
+        console.error(err);
+      },
+    });
+  }
