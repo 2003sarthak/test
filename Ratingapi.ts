@@ -1,4 +1,4 @@
-using CapstoneBackend.Controllers;
+7using CapstoneBackend.Controllers;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -317,3 +317,105 @@ downloadQuotePDF() {
   
     doc.save(`quote-details-${this.quoteDetails.businessName}.pdf`);
   }
+
+
+
+downloadQuotePDF() {
+  if (!this.quoteDetails) {
+    this.alertMessage = 'Quote details are not available to download!';
+    this.alertType = 'error';
+    return;
+  }
+
+  const doc = new jsPDF();
+  const fontSize = 12;
+  const lineSpacing = 10;
+  const marginY = 14;
+  const pageHeight = doc.internal.pageSize.height;
+  const imgData = 'logofinal1.png';
+
+  // Add watermark to the current page
+  const addWatermark = () => {
+    doc.addImage(imgData, 'PNG', 40, 80, 120, 140);
+  };
+
+  // Initial watermark & header
+  addWatermark();
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(fontSize);
+
+  // Title and header
+  doc.setTextColor(255, 215, 0);
+  doc.setFontSize(24);
+  doc.text('BizProtect', marginY, 20);
+  doc.setTextColor(0, 0, 0);
+
+  doc.setFontSize(16);
+  doc.text('Quote Details', marginY, 40);
+
+  // Add details one by one
+  const details = [
+    { label: 'Broker ID', value: this.quoteDetails.brokerId },
+    { label: 'Broker Name', value: this.quoteDetails.brokerName },
+    { label: 'Business Name', value: this.quoteDetails.businessName },
+    { label: 'GST Number', value: this.quoteDetails.gstNo },
+    { label: 'Annual Turnover', value: `Rs. ${this.quoteDetails.annualTurnover}` },
+    { label: 'Property Value', value: `Rs. ${this.quoteDetails.propertyValue}` },
+    { label: 'Location Type', value: this.quoteDetails.locationType },
+    { label: 'Contact Person', value: this.quoteDetails.contactPersonName },
+    { label: 'Phone Number', value: this.quoteDetails.contactPhoneNumber },
+    { label: 'Email', value: this.quoteDetails.email },
+    { label: 'Business Address', value: this.quoteDetails.businessAddress },
+    { label: 'Year of Operation', value: this.quoteDetails.yearOfOperation },
+    { label: 'Number of Employees', value: this.quoteDetails.numberOfEmployees },
+    { label: 'Natural Calamity Coverage Needed', value: this.quoteDetails.naturalCalamityCoverageNeeded ? 'Yes' : 'No' },
+    { label: 'About Business', value: this.quoteDetails.aboutBusiness },
+    { label: 'Plan Type', value: this.quoteDetails.planType },
+    { label: 'Quote Amount', value: `Rs. ${this.quoteDetails.quoteAmount}` },
+    { label: 'Status', value: this.quoteDetails.status ? 'Submitted' : 'Draft' },
+  ];
+
+  let currentY = 50;
+  doc.setFontSize(fontSize);
+
+  details.forEach((detail) => {
+    // Check if next line will overflow page
+    if (currentY + lineSpacing > pageHeight - marginY) {
+      doc.addPage();
+      addWatermark();
+      doc.setFontSize(fontSize);
+      currentY = marginY + 10;
+    }
+    doc.text(`${detail.label}: ${detail.value}`, marginY, currentY);
+    currentY += lineSpacing;
+  });
+
+  // Add Breakdown Table if factors exist
+  if (this.baseRate || this.businessTypeRate || this.locationRate || this.experienceRate || this.employeeRate || this.calamityCoverageRate) {
+    const breakdownTable = [
+      ['Property Value', `Rs. ${this.propertyRate || 0}`],
+      ['Base Rate', `${(this.baseRate || 0) * 100}%`],
+      ['Business Type Adjustment', `${(this.businessTypeRate || 0) * 100}%`],
+      ['Location Adjustment', `${(this.locationRate || 0) * 100}%`],
+      ['Years of Operation Adjustment', `${(this.experienceRate || 0) * 100}%`],
+      ['Employee Count Adjustment', `${(this.employeeRate || 0) * 100}%`],
+      ['Natural Calamity Coverage Adjustment', `${(this.calamityCoverageRate || 0) * 100}%`],
+      ['Total Adjustment', `${(this.finalRate || 0) * 100}%`],
+    ];
+
+    autoTable(doc, {
+      startY: currentY + 10,
+      head: [['Factor', 'Percentage/Adjustment']],
+      body: breakdownTable,
+      styles: {
+        font: 'helvetica',
+        fontSize: fontSize,
+      },
+      didDrawPage: (data) => {
+        addWatermark();
+      },
+    });
+  }
+
+  doc.save(`quote-details-${this.quoteDetails.businessName}.pdf`);
+}
