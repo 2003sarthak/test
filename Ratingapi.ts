@@ -159,5 +159,67 @@ namespace CapstoneBackend.Controllers
     }
 }
 
+using CapstoneBackend.Controllers;
+using Microsoft.AspNetCore.Mvc;
+using NUnit.Framework;
 
+namespace CapstoneBackend.NUnitTests
+{
+    [TestFixture]
+    public class RatingControllerTests
+    {
+        private RatingController _controller;
+
+        [SetUp]
+        public void Setup()
+        {
+            _controller = new RatingController();
+        }
+
+        [Test]
+        public void CalculateQuote_WithValidInput_ReturnsOkResultWithQuote()
+        {
+            // Arrange
+            var dto = new QuoteCalculationDto
+            {
+                annualTurnover = 1000000,
+                propertyValue = 500000,
+                ownershipType = "Owned",
+                businessType = "Retail",
+                locationType = "Urban",
+                planType = "Gold",
+                yearOfOperation = 5,
+                numberOfEmployees = 20,
+                naturalCalamityCoverageNeeded = true
+            };
+
+            // Act
+            var result = _controller.CalculateQuote(dto) as OkObjectResult;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(200, result.StatusCode);
+
+            dynamic response = result.Value;
+            double quoteAmount = response.quoteAmount;
+
+            Assert.IsTrue(quoteAmount > 0);
+            Assert.IsNotNull(response.breakdown);
+        }
+
+        [Test]
+        public void CalculateQuote_WithNullInput_ReturnsBadRequest()
+        {
+            // Act
+            var result = _controller.CalculateQuote(null);
+
+            // Assert
+            Assert.IsInstanceOf<BadRequestObjectResult>(result);
+            var badRequestResult = result as BadRequestObjectResult;
+
+            Assert.AreEqual(400, badRequestResult.StatusCode);
+            Assert.AreEqual("Invalid quote data.", badRequestResult.Value);
+        }
+    }
+}
 
