@@ -181,3 +181,44 @@ export class NavbarComponent {
     });
   }
 }
+
+
+
+
+/* Read alert styling */
+.read-alert {
+  background-color: #1f2937 !important;
+  color: #9ca3af !important;
+}
+
+/* Alert content and icon */
+.alert-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mark-read-icon {
+  cursor: pointer;
+  color: #f87171;
+  margin-left: 10px;
+  transition: color 0.3s;
+}
+
+.mark-read-icon.read {
+  color: #9ca3af;
+}
+
+
+<div class="notification-scroll-container">
+          <div *ngFor="let alert of alerts; let i = index" class="alert" 
+               [ngClass]="[alert.type, alert.seen ? 'read-alert' : '']">
+            <div class="alert-content">
+              {{ alert.message }}
+              <i class="fas fa-check-circle mark-read-icon" 
+                 [class.read]="alert.seen" 
+                 (click)="markAsRead(i)">
+              </i>
+            </div>
+          </div>
+        </div>
