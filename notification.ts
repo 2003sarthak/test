@@ -243,3 +243,210 @@ u can see the benifits here so it in a good ui way
     font-weight: 600;
   }
 the css of the dialgue box should be like this css that is t&c file css 
+
+
+
+
+
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+
+@Component({
+  selector: 'app-quote-upgrade-dialog',
+  standalone: true,
+  templateUrl: './quote-upgrade-dialog.component.html',
+  styleUrls: ['./quote-upgrade-dialog.component.css']
+})
+export class QuoteUpgradeDialogComponent {
+  @Input() selectedPlan: 'Normal' | 'Gold' | 'Premium' = 'Normal';
+  @Input() normalQuotedAmount: number = 0;
+  @Input() goldQuotedAmount: number = 0;
+  @Input() premiumQuotedAmount: number = 0;
+  @Output() close = new EventEmitter<void>();
+
+  get upgradeSuggestion() {
+    if (this.selectedPlan === 'Normal') {
+      return {
+        upgradeTo: 'Gold',
+        extraCost: this.goldQuotedAmount - this.normalQuotedAmount,
+        claimIncreaseNote: 'Get up to 80% coverage instead of 60%',
+        benefits: ['Accidental Losses', 'Minor Damage Coverage']
+      };
+    } else if (this.selectedPlan === 'Gold') {
+      return {
+        upgradeTo: 'Premium',
+        extraCost: this.premiumQuotedAmount - this.goldQuotedAmount,
+        claimIncreaseNote: 'Get up to 100% coverage instead of 80%',
+        benefits: ['Business Interruption']
+      };
+    }
+    return null;
+  }
+
+  closeDialog() {
+    this.close.emit();
+  }
+}
+
+
+<div class="dialog-backdrop" *ngIf="upgradeSuggestion">
+  <div class="dialog-box card">
+    <button class="close-btn" (click)="closeDialog()">
+      <i class="fas fa-times"></i>
+    </button>
+
+    <h2>Upgrade Your Plan</h2>
+    <p>
+      You're on the <strong>{{ selectedPlan }}</strong> plan.<br>
+      For just <span class="highlight">₹{{ upgradeSuggestion.extraCost }}</span> more,
+      you can upgrade to <strong>{{ upgradeSuggestion.upgradeTo }}</strong> and get:
+    </p>
+
+    <div class="claim-note highlight">
+      {{ upgradeSuggestion.claimIncreaseNote }}
+    </div>
+
+    <div class="card-section">
+      <div class="coverage-card" *ngFor="let benefit of upgradeSuggestion.benefits">
+        {{ benefit }}
+      </div>
+    </div>
+
+    <div class="footer-note">
+      Upgrading gives you better protection and higher claim percentage.
+    </div>
+  </div>
+</div>
+
+
+.dialog-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.dialog-box {
+  position: relative;
+  width: 500px;
+  max-width: 90%;
+  padding: 30px;
+  border-radius: 12px;
+  background-color: #0A0A0A;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  color: #ffffff;
+}
+
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  color: #9ca3af;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  color: #ffffff;
+}
+
+h2 {
+  color: #9ca3af;
+}
+
+.claim-note {
+  margin: 10px 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #60a5fa;
+}
+
+.card-section {
+  margin-top: 20px;
+}
+
+.coverage-card {
+  border: 1px solid #333333;
+  border-radius: 8px;
+  background-color: #1F2937;
+  padding: 12px;
+  margin: 8px 0;
+  color: #ffffff;
+}
+
+.coverage-card:hover {
+  background-color: #293549;
+  transition: background-color 0.3s ease;
+}
+
+.footer-note {
+  margin-top: 25px;
+  font-style: italic;
+  color: #9ca3af;
+}
+
+.highlight {
+  color: #2b6cb0;
+  font-weight: 600;
+}
+
+
+showUpgradeDialog = false;
+async calculateQuote() {
+  await this.calculateQuotesForAllPlans();
+
+  if (!this.quoteForm.valid) {
+    this.alertMessage = 'Please complete all required fields!';
+    this.alertType = 'error';
+    return;
+  }
+
+  const formValue = this.quoteForm.value;
+  const quoteDto = new QuoteCalculationDto(
+    Number(formValue.annualTurnover),
+    Number(formValue.propertyValue),
+    formValue.ownershipType!,
+    formValue.businessType!,
+    formValue.locationType!,
+    formValue.planType!,
+    Number(formValue.yearOfOperation),
+    Number(formValue.numberOfEmployees),
+    formValue.naturalCalamityCoverageNeeded!
+  );
+
+  this.ratingService.calculateQuote(quoteDto).subscribe({
+    next: (calculated) => {
+      this.quoteAmount = calculated.quoteAmount;
+      // set all rates...
+
+      this.alertMessage = 'Quote calculated successfully!';
+      this.alertType = 'success';
+
+      if (formValue.planType !== 'Premium') {
+        setTimeout(() => {
+          this.showUpgradeDialog = true;
+        }, 10000); // Show after 10 seconds
+      }
+    },
+    error: (err) => {
+      this.alertMessage = 'Error calculating quote from server.';
+      this.alertType = 'error';
+    },
+  });
+}
+<app-quote-upgrade-dialog
+  *ngIf="showUpgradeDialog"
+  [selectedPlan]="quoteForm.value.planType"
+  [normalQuotedAmount]="normalQuotedAmount"
+  [goldQuotedAmount]="goldQuotedAmount"
+  [premiumQuotedAmount]="premiumQuotedAmount"
+  (close)="showUpgradeDialog = false">
+</app-quote-upgrade-dialog>
