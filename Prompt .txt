@@ -1,0 +1,67 @@
+Create a workflow diagram for a project titled "Commercial Vehicle Insurance Broker Portal". The workflow should visually represent the end-to-end process of how a broker interacts with the system. Use a clean, modern flowchart or step-by-step style with arrows and labeled components. The workflow should include the following steps:
+
+Broker Login / Registration
+
+Dashboard Access
+
+Create New Quote
+– Form submission
+– Premium calculation via rating API
+– View premium breakdown
+
+Submit Quote
+– Quote status: Pending
+
+Quote Approval Process
+– Admin reviews and updates status to Approved
+
+Generate PDF of Final Quote
+– Download/print option available
+
+View All My Quotes / Quote Details
+This is example to refer the content just before this
+
+I want to create a promit of my porject work flow only or flow chart
+My porject is flowing like
+Home page encounter first
+Then dashboard, quote list , quote form is not accessed since logined so redirected to login page
+After successfull register , login re directed to dashboard page ,which contain all quotes and some more cared and the total income earned by the broker that is 2% of the total quotes created by broker so that broker like to come on our site and make quote
+Then quote list is the page were broker can see his quotes , edit ,delete and view details of that
+Viewing details can be downloaded as pdf format too and edit and delete functionality is accessed only once
+Quote form page is the form required for the user to submit
+Can also see the dynamic terms and conditions page just before submitting the form and calculate the quote and see the breakdown of the quoteamount created and after successful quote creation using email js a email or details is also send to user through admin email
+Then about and contact page is accessible to all telling about founder team why choose us and all
+Contact has a form also contain the email js functionality as soon as perosn fill the form
+Then full terms and conditions page for all 3 type for policies normal gold and premium
+We also have some business partners like other broker portals like flood insurance, auto insurance and cyber business insurance
+Authentication using jwt is also there
+Tech stack used is angular, asp .net web api format
+
+I have to make ppt also for this project for presentation for 4-5 slides
+Also adding the flow chart
+So can we make. Imge for flow chart + prompt to make flow chart and the ppt and content to make ppt
+
+After this i have added notification thing and the u can update your plan to gold or premium with just this and and get these profits
+And i have added a additional functionality that is u can upload a pdf for auto fill the value in quote form
+
+Generate the content for ppt for me
+Outcome
+
+Working Code
+
+PPT covering (High Level Guidance)
+
+Objective and Scope
+
+Technical/Code Architecture
+Functional and Technical features
+
+Functional Details along with rating criteria
+
+Out of Scope and Assumptions
+
+Innovation and Creativity (If Any)
+The assumptions are the admin pannel the because this is just a broker portal for bop for small business
+Also generate a ppt for me after the content generation
+My topic is Business ownership policies
+
