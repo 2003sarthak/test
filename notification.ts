@@ -1,3 +1,8 @@
+string plainPassword = "0123@Abcd";
+string hashedPassword = BCrypt.Net.BCrypt.HashPassword(plainPassword);
+
+Console.WriteLine($"Hashed Password: {hashedPassword}");
+
 normalQuotedAmount: number | null = null;
   goldQuotedAmount: number | null = null;
   premiumQuotedAmount: number | null = null; 
