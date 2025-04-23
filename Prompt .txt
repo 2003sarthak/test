@@ -65,3 +65,84 @@ The assumptions are the admin pannel the because this is just a broker portal fo
 Also generate a ppt for me after the content generation
 My topic is Business ownership policies
 
+
+
+
+
+
+--------------
+
+
+Great! Here's the **PowerPoint content** for your project presentation titled **"Business Ownership Policies Broker Portal"**. You can split this across **4–5 slides**:
+
+---
+
+### **Slide 1: Objective and Scope**
+**Title:** Project Overview – Business Ownership Policies Broker Portal  
+**Objective:**  
+To build a digital platform where brokers can seamlessly create, manage, and submit business insurance quotes for small businesses, enhancing operational efficiency and increasing broker engagement.
+
+**Scope:**  
+- Broker-focused portal for Business Ownership Policies (BOP)  
+- Streamlined quote generation, submission, and tracking  
+- Emphasis on usability, automation, and dynamic interaction
+
+---
+
+### **Slide 2: Technical & Code Architecture**
+**Frontend:** Angular  
+**Backend:** ASP.NET Web API  
+**Authentication:** JWT (JSON Web Token)  
+**Email Services:** EmailJS integration  
+**PDF Generation:** Downloadable quote documents  
+**Data Handling:** Dynamic forms with PDF upload auto-fill  
+**Architecture Diagram (optional visual):**  
+Client (Angular) ↔ Web API (.NET) ↔ Database  
+🔒 Auth | 📧 Email | 📄 PDF | 📊 Calculations
+
+---
+
+### **Slide 3: Functional & Technical Features**
+**Core Features:**  
+- Login / Registration with secure JWT auth  
+- Interactive Dashboard showing:
+  - Total quotes
+  - Quote statistics
+  - Earnings (2% per quote)
+- Quote Form:
+  - Upload PDF for autofill
+  - View and accept dynamic terms & conditions
+  - Real-time premium calculation using Rating API
+- Notification for quote upgrade suggestions (Normal → Gold → Premium)
+
+**Other Functionalities:**  
+- View/Edit/Delete quotes (one-time edit/delete)  
+- PDF download of quote details  
+- About & Contact pages with EmailJS  
+- Quote status tracking (Pending → Approved)
+
+---
+
+### **Slide 4: Functional Details & Assumptions**
+**Quote Rating Criteria:**  
+- Based on business size, location, coverage type (Normal, Gold, Premium)  
+- Premium breakdown shown dynamically before submission
+
+**Out of Scope / Assumptions:**  
+- Admin panel (for internal use, not exposed to brokers)  
+- No claims management – focus is only on quote lifecycle  
+- This is a broker-only portal (not customer-facing)
+
+---
+
+### **Slide 5: Innovation & Creativity**
+**Innovative Features:**  
+- PDF Upload Autofill – reduces broker manual entry  
+- Real-time upgrade suggestions with benefits overview  
+- Earnings Tracker – incentivizes brokers to use the platform  
+- Notification system to engage users post-quote creation  
+- Seamless UX with non-intrusive quote form access control
+
+---
+
+Let me know if you'd like a designed PPT or the flowchart image next!
