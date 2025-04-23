@@ -1,3 +1,4 @@
+$2a$11$MeaC9xZpRbHQUVEymHj9hu5UdXK7sNPgyA.QTdd53KjS4EoD48rXG
 string plainPassword = "0123@Abcd";
 string hashedPassword = BCrypt.Net.BCrypt.HashPassword(plainPassword);
 
