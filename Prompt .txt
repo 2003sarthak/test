@@ -1,148 +1,135 @@
-Create a workflow diagram for a project titled "Commercial Vehicle Insurance Broker Portal". The workflow should visually represent the end-to-end process of how a broker interacts with the system. Use a clean, modern flowchart or step-by-step style with arrows and labeled components. The workflow should include the following steps:
+Here’s a full prompt tailored for generating an awesome dark-themed PowerPoint presentation using tools like Gamma.app, Tome, or AI presentation generators like Beautiful.ai, SlidesAI, or Designs.ai.
 
-Broker Login / Registration
+You can use this prompt as-is inside any AI-based PPT generator that supports themed slides and text-to-presentation input:
 
-Dashboard Access
-
-Create New Quote
-– Form submission
-– Premium calculation via rating API
-– View premium breakdown
-
-Submit Quote
-– Quote status: Pending
-
-Quote Approval Process
-– Admin reviews and updates status to Approved
-
-Generate PDF of Final Quote
-– Download/print option available
-
-View All My Quotes / Quote Details
-This is example to refer the content just before this
-
-I want to create a promit of my porject work flow only or flow chart
-My porject is flowing like
-Home page encounter first
-Then dashboard, quote list , quote form is not accessed since logined so redirected to login page
-After successfull register , login re directed to dashboard page ,which contain all quotes and some more cared and the total income earned by the broker that is 2% of the total quotes created by broker so that broker like to come on our site and make quote
-Then quote list is the page were broker can see his quotes , edit ,delete and view details of that
-Viewing details can be downloaded as pdf format too and edit and delete functionality is accessed only once
-Quote form page is the form required for the user to submit
-Can also see the dynamic terms and conditions page just before submitting the form and calculate the quote and see the breakdown of the quoteamount created and after successful quote creation using email js a email or details is also send to user through admin email
-Then about and contact page is accessible to all telling about founder team why choose us and all
-Contact has a form also contain the email js functionality as soon as perosn fill the form
-Then full terms and conditions page for all 3 type for policies normal gold and premium
-We also have some business partners like other broker portals like flood insurance, auto insurance and cyber business insurance
-Authentication using jwt is also there
-Tech stack used is angular, asp .net web api format
-
-I have to make ppt also for this project for presentation for 4-5 slides
-Also adding the flow chart
-So can we make. Imge for flow chart + prompt to make flow chart and the ppt and content to make ppt
-
-After this i have added notification thing and the u can update your plan to gold or premium with just this and and get these profits
-And i have added a additional functionality that is u can upload a pdf for auto fill the value in quote form
-
-Generate the content for ppt for me
-Outcome
-
-Working Code
-
-PPT covering (High Level Guidance)
-
-Objective and Scope
-
-Technical/Code Architecture
-Functional and Technical features
-
-Functional Details along with rating criteria
-
-Out of Scope and Assumptions
-
-Innovation and Creativity (If Any)
-The assumptions are the admin pannel the because this is just a broker portal for bop for small business
-Also generate a ppt for me after the content generation
-My topic is Business ownership policies
-
-
-
-
-
-
---------------
-
-
-Great! Here's the **PowerPoint content** for your project presentation titled **"Business Ownership Policies Broker Portal"**. You can split this across **4–5 slides**:
 
 ---
 
-### **Slide 1: Objective and Scope**
-**Title:** Project Overview – Business Ownership Policies Broker Portal  
-**Objective:**  
-To build a digital platform where brokers can seamlessly create, manage, and submit business insurance quotes for small businesses, enhancing operational efficiency and increasing broker engagement.
+Full Prompt for PPT Generation
 
-**Scope:**  
-- Broker-focused portal for Business Ownership Policies (BOP)  
-- Streamlined quote generation, submission, and tracking  
-- Emphasis on usability, automation, and dynamic interaction
+Title:
+Business Ownership Policy – Insurance Broker Portal
+
+Theme:
+Dark theme with neon accents (blue, cyan, orange). Use neumorphism-style UI cards, tech-modern icons, and a consistent business-professional font like Montserrat or Open Sans.
+
+Slide 1: Title Slide
+
+Title: Business Ownership Policy Insurance Broker Portal
+
+Subtitle: Empowering Small Business Brokers with Seamless Quote Management
+
+Background: Abstract insurance concept with a broker dashboard in neon tech-style.
+
+
+Slide 2: Introduction
+
+Brief about what Business Ownership Policies (BOP) are.
+
+Importance for small businesses (coverage, ease, protection).
+
+Goal: Helping brokers streamline quote management, boost productivity.
+
+
+Slide 3: Objective and Scope
+
+Provide a centralized platform for BOP quote generation
+
+Simplify quote tracking, form submission, and premium breakdown
+
+Tech Stack: Angular + ASP.NET Web API + JWT Auth + EmailJS
+
+Scope: Broker-side only, Admin Panel is out of scope
+
+
+Slide 4: Workflow / Functional Flow
+
+Home → Login/Register → Dashboard
+
+Create New Quote → Fill Form → Calculate via API → Review T&C
+
+Submit Quote → Status Pending → Admin Approves → PDF Generated
+
+Notification via EmailJS
+
+Access to All Quotes → View/Edit/Delete (only once) → Download as PDF
+
+
+Slide 5: Technical Architecture
+
+Angular Frontend
+
+ASP.NET Core Web API Backend
+
+Entity Framework + SQL DB
+
+JWT Authentication
+
+EmailJS for notifications
+
+Rating Service API for dynamic premium calculation
+
+PDF Auto-fill functionality using uploaded files
+
+
+Slide 6: Functional & Technical Features
+
+Quote Form with validation & auto-fill via PDF
+
+Dashboard with income summary (2% brokerage per quote)
+
+Quote editing, single-time delete/update
+
+Dynamic T&C Cards for Normal, Gold, Premium
+
+Real-time notifications via bell icon
+
+“Upgrade Plan” Upsell Dialog with benefits highlight
+
+Contact Form with EmailJS
+
+Public pages: About, Contact, Partner Info
+
+
+Slide 7: Innovations & Creative Additions
+
+PDF upload to auto-fill quote form
+
+Real-time notifications for quote actions
+
+Plan Upgrade prompt: “Upgrade to Gold for just ₹X more!”
+
+Terms & Conditions with neumorphism card design
+
+Future Scope: Group chat for error resolution, admin-to-broker communication (dialogue box), and notifications
+
+
+Slide 8: Out of Scope & Assumptions
+
+Admin Panel is assumed out of scope
+
+Broker Portal only
+
+No role-based UI (for now)
+
+Email sending from backend disabled due to office laptop restrictions
+
+
+Slide 9: Outcome & Working Code
+
+Working Angular Frontend
+
+Connected .NET Backend
+
+Live quote submission and breakdown
+
+PDF generation working
+
+Dynamic plan upgrade prompts, EmailJS & JWT implemented
+
+
 
 ---
 
-### **Slide 2: Technical & Code Architecture**
-**Frontend:** Angular  
-**Backend:** ASP.NET Web API  
-**Authentication:** JWT (JSON Web Token)  
-**Email Services:** EmailJS integration  
-**PDF Generation:** Downloadable quote documents  
-**Data Handling:** Dynamic forms with PDF upload auto-fill  
-**Architecture Diagram (optional visual):**  
-Client (Angular) ↔ Web API (.NET) ↔ Database  
-🔒 Auth | 📧 Email | 📄 PDF | 📊 Calculations
+Let me know if you'd like me to generate this into a real .pptx file with slides or also design images for each one of these slides.
 
----
-
-### **Slide 3: Functional & Technical Features**
-**Core Features:**  
-- Login / Registration with secure JWT auth  
-- Interactive Dashboard showing:
-  - Total quotes
-  - Quote statistics
-  - Earnings (2% per quote)
-- Quote Form:
-  - Upload PDF for autofill
-  - View and accept dynamic terms & conditions
-  - Real-time premium calculation using Rating API
-- Notification for quote upgrade suggestions (Normal → Gold → Premium)
-
-**Other Functionalities:**  
-- View/Edit/Delete quotes (one-time edit/delete)  
-- PDF download of quote details  
-- About & Contact pages with EmailJS  
-- Quote status tracking (Pending → Approved)
-
----
-
-### **Slide 4: Functional Details & Assumptions**
-**Quote Rating Criteria:**  
-- Based on business size, location, coverage type (Normal, Gold, Premium)  
-- Premium breakdown shown dynamically before submission
-
-**Out of Scope / Assumptions:**  
-- Admin panel (for internal use, not exposed to brokers)  
-- No claims management – focus is only on quote lifecycle  
-- This is a broker-only portal (not customer-facing)
-
----
-
-### **Slide 5: Innovation & Creativity**
-**Innovative Features:**  
-- PDF Upload Autofill – reduces broker manual entry  
-- Real-time upgrade suggestions with benefits overview  
-- Earnings Tracker – incentivizes brokers to use the platform  
-- Notification system to engage users post-quote creation  
-- Seamless UX with non-intrusive quote form access control
-
----
-
-Let me know if you'd like a designed PPT or the flowchart image next!
