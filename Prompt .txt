@@ -1,3 +1,9 @@
+
+
+Create a modern dark-themed PowerPoint on “Business Ownership Policy – Insurance Broker Portal”. Include: intro to BOP, broker dashboard, login, quote creation (form, API, breakdown), submission, admin approval, PDF generation, view/edit quotes, notifications, EmailJS, JWT auth, PDF upload for auto-fill, dynamic T&C cards (Normal/Gold/Premium), upgrade plan prompt, tech stack (Angular + .NET), features, scope (broker only), out of scope (admin panel), and innovations. Use neumorphism UI, tech-modern icons, and business-style fonts. Add relevant visuals per slide and flowchart in slide 4.
+
+
+
 Here’s a full prompt tailored for generating an awesome dark-themed PowerPoint presentation using tools like Gamma.app, Tome, or AI presentation generators like Beautiful.ai, SlidesAI, or Designs.ai.
 
 You can use this prompt as-is inside any AI-based PPT generator that supports themed slides and text-to-presentation input:
