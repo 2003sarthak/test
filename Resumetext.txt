@@ -1,0 +1,203 @@
+Great — I can see both your new resume format from the image and the current resume content from the uploaded PDF. I’ll help you map the existing information into the headings of the new resume template you showed in the picture.
+
+Here’s a clean breakdown of what to put where:
+
+
+---
+
+Left yellow panel of the new format:
+
+Photo & Name
+
+Already shown as “Sarthak Goyal” with photo, keep that as is.
+
+
+
+---
+
+Domain Skills
+
+From your current resume (SKILLS section), you can place:
+
+Frontend:
+
+HTML, CSS, JavaScript, React, Angular, Bootstrap, Tailwind
+
+
+Backend:
+
+Node.js, Express.js, ASP.NET Core Web API
+
+
+Programming:
+
+C, C++, Java, C#, Python (basics)
+
+
+Databases:
+
+MySQL, MongoDB
+
+
+Problem Solving:
+
+Data Structures and Algorithms (300+ LeetCode problems)
+
+
+Soft Skills:
+
+Teamwork, Communication, Leadership, Adaptability
+
+
+
+---
+
+Academic Education
+
+Bachelor of Technology
+Information Technology, Harcourt Butler Technical University, Kanpur, India
+2021–2025
+CGPA: 9.14
+
+
+---
+
+Center white panel of the new format:
+
+Professional Summary
+
+Adapt from your INTRODUCTION:
+
+> Analyst Programmer L1 at Xceedance with experience in Duck Creek development, enterprise software integration, and full-stack web development. Strong foundation in MERN stack, .NET, and data structures & algorithms. Passionate about building scalable, user-centric solutions, collaborating cross-functionally, and continuously learning modern technologies.
+
+
+
+
+---
+
+Capabilities
+
+You can copy from the current resume, adapted:
+
+Duck Creek Policy development
+
+.NET/Angular enterprise applications
+
+MERN stack development
+
+Agile methodologies
+
+Strong analytical and problem-solving
+
+
+
+---
+
+PM Tools
+
+(from your experience with projects)
+
+Jira
+
+MS Project
+
+DevOps tools (if you used them, can mention here)
+
+
+
+---
+
+Work Experience
+
+Xceedance Consulting India Pvt. Ltd., Noida, India
+
+Analyst Programmer L1 (June 2025 – Present)
+
+Developing customized Duck Creek Policy solutions for enterprise insurance clients, collaborating with cross-functional teams to enhance platform capabilities and code quality.
+
+
+System Integration Intern (Jan 2025 – June 2025)
+
+Contributed to Duck Creek software development by building and testing .NET and Angular components, strengthening skills in agile full-stack environments.
+
+
+
+---
+
+Current Project
+
+Use the style in the new resume you showed:
+
+Company: Xceedance
+Duration: July 2024 – Present
+Designation: Analyst Programmer L1
+Responsibility: Developing Duck Creek Policy solutions and enhancing enterprise insurance products
+Role: Developer
+Technology: Duck Creek, .NET, Angular
+Team Size: 3–5
+
+(adjust duration if needed)
+
+
+---
+
+Past Project
+
+You can mention your BizProtect / TechTreasure college project for a past personal project:
+
+Project: BizProtect
+Duration: 4 months (college project)
+Responsibility: Full-stack developer
+Role: Team Lead
+Technology: Angular, .NET Web API
+Team Size: 4
+
+Or if you prefer, list your Duck Creek internship project from Jan–June 2025.
+
+
+---
+
+Right yellow panel of the new format:
+
+Awards
+
+4th place in college hackathon among 100+ teams
+
+Head Event Manager for college event with 500+ attendees
+
+
+
+---
+
+Travel Availability
+
+You can write:
+
+> “Available to travel from July 2025”
+
+
+
+
+---
+
+LinkedIn
+
+Use your LinkedIn:
+https://www.linkedin.com/in/sarthak-goyal-181996227/
+
+
+---
+
+EXTRA: Social Links (if you want)
+
+If you want to add your portfolio or GitHub:
+
+Portfolio: https://portfolio-sarthak-goyal.vercel.app/
+
+GitHub: https://github.com/2003sarthak
+
+
+
+---
+
+⭐ In short — I can help you neatly fill in your new resume template. If you want, I can even directly format a text draft in exactly that new layout, ready to paste. Just say: “Make the draft in new format” and I will do that next.
